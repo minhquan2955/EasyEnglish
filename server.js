@@ -9,6 +9,7 @@ import authRoutes from "./backend/src/routes/auth.routes.js";
 import registrationRoutes from "./backend/src/routes/registration.routes.js";
 import adminRoutes from "./backend/src/routes/admin.routes.js";
 import courseRoutes from "./backend/src/routes/course.routes.js";
+import classRoutes from "./backend/src/routes/class.routes.js";
 const app = express();
 
 // Middleware để parse body dưới dạng JSON
@@ -29,6 +30,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/registrations", registrationRoutes);
 // Course routes (quản lý khóa học)
 app.use("/api/courses", courseRoutes);
+// Class routes (quản lý lớp học)
+app.use("/api/classes", classRoutes);
 // Middleware xử lý lỗi (phải được đặt ở cuối cùng, sau các routes)
 app.use(notFound);
 app.use(errorHandler);
