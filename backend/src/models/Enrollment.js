@@ -19,8 +19,12 @@ const enrollmentSchema = new mongoose.Schema(
       default: "active",
     },
     finalGrade: { type: String },
+    notes: { type: String },
   },
   { timestamps: true },
 );
+
+// Compound Unique Index: Đảm bảo 1 học sinh chỉ ghi danh VÀO 1 lớp DUY NHẤT 1 lần
+enrollmentSchema.index({ studentId: 1, classId: 1 }, { unique: true });
 
 export default mongoose.model("Enrollment", enrollmentSchema);
