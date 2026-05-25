@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken"
-import {env} from "../config/env.js"
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 /**
  * Tao JWT Access Token
  * payload - "dữ liệu cốt lõi" được vận chuyển
@@ -8,10 +8,10 @@ import {env} from "../config/env.js"
  */
 
 export const generateToken = (payload) => {
-    return jwt.sign(payload, env.JWT_SECRET, {
-        expiresIn: "7d"
-    })
-}
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+};
 
 /**
  * @param {String} Token JWT token can giai ma
@@ -19,5 +19,5 @@ export const generateToken = (payload) => {
  * @throws {Error} token ko hop le
  */
 export const verifyToken = (token) => {
-    return jwt.verify(token, env.JWT_SECRET);
-}
+  return jwt.verify(token, env.JWT_SECRET);
+};
