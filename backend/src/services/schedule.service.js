@@ -121,3 +121,51 @@ export const deleteSchedulesByClass = async (classId) => {
     deletedCount: result.deletedCount,
   };
 };
+
+export const autoCompleteExpiredSchedules = async () => {
+  try {
+    const now = new Date();
+
+    // Tạo mốc "đầu ngày hôm nay" (00:00:00) để phân biệt ngày hôm qua vs hôm nay
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+
+    // Lấy giờ:phút hiện tại dạng "HH:MM" để so sánh với endTime
+    const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+    // Cập nhật tất cả buổi học đã hết giờ
+    // $or: thỏa MÃN 1 TRONG 2 điều kiện
+    //   Điều kiện 1: date < todayStart => ngày học đã qua
+    //   Điều kiện 2: date = todayStart VÀ endTime <= currentTime → hôm nay nhưng đã hết giờ
+    const result = await Schedule.updateMany(
+      {
+        status: "scheduled",
+        $or: [
+          // Trường hợp 1: Buổi học ở ngày đã qua
+          { date: { $lt: todayStart } },
+          // Trường hợp 2: Buổi học hôm nay nhưng đã hết giờ
+          {
+            date: {
+              $gte: todayStart,
+              $lt: new Date(todayStart.getTime() + 24 * 60 * 60 * 1000),
+            },
+            endTime: { $lte: currentTime },
+          },
+        ],
+      },
+      { $set: { status: "completed" } },
+    );
+
+    // Chỉ log khi thực sự có cập nhật
+    if (result.modifiedCount > 0) {
+      console.log(
+        `[Auto-Complete] Đã cập nhật ${result.modifiedCount} buổi học sang "completed" lúc ${now.toLocaleString("vi-VN")}`,
+      );
+    }
+  } catch (error) {
+    console.error("[Auto-Complete] Lỗi:", error.message);
+  }
+};

@@ -20,8 +20,9 @@ const attendanceSchema = new mongoose.Schema(
     status: { type: String, enum: ["present", "absent"], required: true },
     checkedInAt: { type: Date },
     checkedInBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // teacher who checked in
+    notes: { type: String },
   },
   { timestamps: true },
 );
-
+attendanceSchema.index({ scheduleId: 1, studentId: 1 }, { unique: true });
 export default mongoose.model("Attendance", attendanceSchema);
