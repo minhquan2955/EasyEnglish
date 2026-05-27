@@ -26,5 +26,5 @@ const scheduleSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+scheduleSchema.index({ classId: 1, sessionNumber: 1 }, { unique: true });
 export default mongoose.model("Schedule", scheduleSchema);

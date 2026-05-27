@@ -11,6 +11,7 @@ import adminRoutes from "./backend/src/routes/admin.routes.js";
 import courseRoutes from "./backend/src/routes/course.routes.js";
 import classRoutes from "./backend/src/routes/class.routes.js";
 import enrollmentRoutes from "./backend/src/routes/enrollment.routes.js";
+import scheduleRoutes from "./backend/src/routes/schedule.routes.js";
 const app = express();
 
 // Middleware để parse body dưới dạng JSON
@@ -35,6 +36,8 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/classes", classRoutes);
 // Enrollment routes (ghi danh học sinh vào lớp)
 app.use("/api/enrollments", enrollmentRoutes);
+// Schedule routes (thời khóa biểu — quản lý từng buổi học)
+app.use("/api/schedules", scheduleRoutes);
 // Middleware xử lý lỗi (phải được đặt ở cuối cùng, sau các routes để bắt lỗi khi lỗi xảy ra ở các routes)
 app.use(notFound);
 app.use(errorHandler);
