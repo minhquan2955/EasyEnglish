@@ -1,6 +1,7 @@
 import Class from "../models/Class.js";
 import Course from "../models/Course.js";
 import Teacher from "../models/Teacher.js";
+import { checkScheduleConflict } from "../utils/scheduleHelper.js";
 
 // ==================== CREATE ====================
 /**
@@ -49,48 +50,17 @@ export const createClass = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy giáo viên đã cung cấp");
     }
-    // --- Kiểm tra xung đột lịch dạy của giáo viên ---
-    // Chỉ kiểm tra khi lớp mới có thông tin schedule
-    if (schedule) {
-      const conflictingClass = await Class.findOne({
-        teacherId, // Cùng giáo viên
-        status: "active", // Chỉ xét lớp đang hoạt động
-
-        // Trùng ít nhất 1 ngày trong tuần
-        // $in: kiểm tra mảng daysOfWeek mới có phần tử nào
-        //      trùng với mảng daysOfWeek của lớp cũ không
-        "schedule.daysOfWeek": { $in: schedule.daysOfWeek },
-
-        // Trùng khung giờ (2 khoảng thời gian giao nhau)
-        // Điều kiện: giờ bắt đầu lớp cũ < giờ kết thúc lớp mới
-        //        VÀ giờ kết thúc lớp cũ > giờ bắt đầu lớp mới
-        "schedule.startTime": { $lt: schedule.endTime },
-        "schedule.endTime": { $gt: schedule.startTime },
-      });
-
-      if (conflictingClass) {
-        res.status(409); // xảy ra confict
-        throw new Error(
-          `Giáo viên đã có lớp ${conflictingClass.classCode} trùng lịch dạy`,
-        );
-      }
-    }
-    // --- Kiểm tra xung đột phòng học ---
-    // Chỉ kiểm tra khi có cả room VÀ schedule
-    if (room && schedule) {
-      const roomConflict = await Class.findOne({
-        room, // Cùng phòng
-        status: "active",
-        "schedule.daysOfWeek": { $in: schedule.daysOfWeek },
-        "schedule.startTime": { $lt: schedule.endTime },
-        "schedule.endTime": { $gt: schedule.startTime },
-      });
-      if (roomConflict) {
-        res.status(409);
-        throw new Error(
-          `Phòng ${room} đã được sử dụng bởi lớp ${roomConflict.classCode} trong khung giờ này`,
-        );
-      }
+    // --- Kiểm tra xung đột lịch dạy và phòng học ---
+    const conflictCheck = await checkScheduleConflict({
+      teacherId,
+      room,
+      schedule,
+      startDate,
+      endDate,
+    });
+    if (conflictCheck.hasConflict) {
+      res.status(409);
+      throw new Error(conflictCheck.message);
     }
     const newClass = await Class.create({
       classCode,
@@ -126,7 +96,7 @@ export const getClasses = async (req, res, next) => {
     const skip = (page - 1) * limit;
     const [classes, total] = await Promise.all([
       Class.find(filter)
-        // ↓↓↓ KHÁI NIỆM MỚI: populate() ↓↓↓
+        //KHÁI NIỆM MỚI: populate()
         .populate("courseId", "code name category")
         .populate({
           path: "teacherId",
@@ -206,64 +176,31 @@ export const updateClass = async (req, res, next) => {
         throw new Error("Không tìm thấy giáo viên với teacherId đã cung cấp");
       }
     }
-    // --- Kiểm tra xung đột lịch dạy khi thay đổi giáo viên hoặc lịch ---
-    // Chỉ kiểm tra khi có thay đổi teacherId hoặc schedule
-    if (req.body.teacherId || req.body.schedule) {
-      // Lấy thông tin lớp hiện tại từ DB để biết teacher/schedule cũ
-      const currentClass = await Class.findById(req.params.id);
-      if (!currentClass) {
-        res.status(404);
-        throw new Error("Không tìm thấy lớp học");
-      }
-
-      // Xác định giá trị sẽ dùng sau khi cập nhật:
-      // Nếu client gửi giá trị mới → dùng giá trị mới
-      // Nếu không gửi → giữ nguyên giá trị cũ từ DB
-      const finalTeacherId = req.body.teacherId || currentClass.teacherId;
-      const finalSchedule = req.body.schedule || currentClass.schedule;
-
-      // Chỉ kiểm tra nếu lớp có schedule
-      if (finalSchedule && finalSchedule.daysOfWeek) {
-        const conflictingClass = await Class.findOne({
-          // Loại trừ chính lớp đang sửa (lớp không thể xung đột với chính nó!)
-          _id: { $ne: req.params.id }, // $ne = "not equal" (không bằng)
-          teacherId: finalTeacherId,
-          status: "active",
-          "schedule.daysOfWeek": { $in: finalSchedule.daysOfWeek },
-          "schedule.startTime": { $lt: finalSchedule.endTime },
-          "schedule.endTime": { $gt: finalSchedule.startTime },
-        });
-
-        if (conflictingClass) {
-          res.status(409);
-          throw new Error(
-            `Giáo viên đã có lớp ${conflictingClass.classCode} trùng lịch dạy`,
-          );
-        }
-      }
+    // --- Kiểm tra xung đột lịch dạy và phòng học khi cập nhật ---
+    const currentClass = await Class.findById(req.params.id);
+    if (!currentClass) {
+      res.status(404);
+      throw new Error("Không tìm thấy lớp học");
     }
-    // --- Kiểm tra xung đột phòng học khi cập nhật ---
-    if (req.body.room || req.body.schedule) {
-      const currentClass = await Class.findById(req.params.id);
-      // (nếu đã query currentClass ở trên thì có thể tái sử dụng, không cần query lại)
-      const finalRoom = req.body.room || currentClass?.room;
-      const finalSchedule = req.body.schedule || currentClass?.schedule;
-      if (finalRoom && finalSchedule && finalSchedule.daysOfWeek) {
-        const roomConflict = await Class.findOne({
-          _id: { $ne: req.params.id }, // Loại trừ chính lớp đang sửa
-          room: finalRoom,
-          status: "active",
-          "schedule.daysOfWeek": { $in: finalSchedule.daysOfWeek },
-          "schedule.startTime": { $lt: finalSchedule.endTime },
-          "schedule.endTime": { $gt: finalSchedule.startTime },
-        });
-        if (roomConflict) {
-          res.status(409);
-          throw new Error(
-            `Phòng ${finalRoom} đã được sử dụng bởi lớp ${roomConflict.classCode} trong khung giờ này`,
-          );
-        }
-      }
+
+    const finalTeacherId = req.body.teacherId || currentClass.teacherId;
+    const finalRoom = req.body.room || currentClass.room;
+    const finalSchedule = req.body.schedule || currentClass.schedule;
+    const finalStartDate = req.body.startDate || currentClass.startDate;
+    const finalEndDate = req.body.endDate || currentClass.endDate;
+
+    const conflictCheck = await checkScheduleConflict({
+      teacherId: finalTeacherId,
+      room: finalRoom,
+      schedule: finalSchedule,
+      startDate: finalStartDate,
+      endDate: finalEndDate,
+      excludeClassId: req.params.id,
+    });
+
+    if (conflictCheck.hasConflict) {
+      res.status(409);
+      throw new Error(conflictCheck.message);
     }
     const updatedClass = await Class.findByIdAndUpdate(
       req.params.id,
