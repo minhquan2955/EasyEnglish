@@ -14,6 +14,7 @@ import enrollmentRoutes from "./backend/src/routes/enrollment.routes.js";
 import scheduleRoutes from "./backend/src/routes/schedule.routes.js";
 import { autoCompleteExpiredSchedules } from "./backend/src/services/schedule.service.js";
 import attendanceRoutes from "./backend/src/routes/attendance.routes.js";
+import gradeRoutes from "./backend/src/routes/grade.routes.js";
 const app = express();
 
 // Middleware để parse body dưới dạng JSON
@@ -42,6 +43,8 @@ app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/schedules", scheduleRoutes);
 // Attendance routes (điểm danh)
 app.use("/api/attendances", attendanceRoutes);
+// Grade routes (quản lý điểm số)
+app.use("/api/grades", gradeRoutes);
 // Middleware xử lý lỗi (phải được đặt ở cuối cùng, sau các routes để bắt lỗi khi lỗi xảy ra ở các routes)
 app.use(notFound);
 app.use(errorHandler);

@@ -30,5 +30,9 @@ const gradeSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+// Compound Index: 1 HS chỉ có 1 điểm cho mỗi bài trong 1 lớp
+gradeSchema.index(
+  { studentId: 1, classId: 1, assessmentType: 1, title: 1 },
+  { unique: true },
+);
 export default mongoose.model("Grade", gradeSchema);
