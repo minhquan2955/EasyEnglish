@@ -17,6 +17,8 @@ import {
   getSchedulesByTeacher,
   getSchedulesByClass,
   deleteSchedulesByClassId,
+  getMySchedule,
+  getChildrenSchedule,
 } from "../controllers/schedule.controller.js";
 
 const router = Router();
@@ -32,6 +34,10 @@ router.post(
   validate(generateScheduleSchema),
   generateSchedule,
 );
+
+// ---- Student & Parent xem lịch (đặt trước /:id) ----
+router.get("/my-schedule", authorize("student"), getMySchedule);
+router.get("/my-children", authorize("parent"), getChildrenSchedule);
 
 // ---- Convenience routes (đặt trước /:id) ----
 router.get(

@@ -1,6 +1,9 @@
 import Schedule from "../models/Schedule.js";
 import Class from "../models/Class.js";
 import Teacher from "../models/Teacher.js";
+import Student from "../models/Student.js";
+import Parent from "../models/Parent.js";
+import Enrollment from "../models/Enrollment.js";
 import {
   generateScheduleForClass,
   deleteSchedulesByClass,
@@ -471,6 +474,162 @@ export const deleteSchedulesByClassId = async (req, res, next) => {
       message: `Đã xóa ${result.deletedCount} buổi học chưa diễn ra`,
       ...result,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==================== STUDENT & PARENT SCHEDULE ====================
+/**
+ * @desc    Student xem lịch học các lớp mình đang ghi danh
+ * @route   GET /api/schedules/my-schedule?from=...&to=...
+ * @access  Private (Student only)
+ *
+ * LUỒNG DỮ LIỆU:
+ *   req.user.userId → Student → Enrollment (active) → Schedule
+ */
+export const getMySchedule = async (req, res, next) => {
+  try {
+    const { from, to } = req.query;
+
+    // 1. Tìm Student profile từ userId trong token
+    const student = await Student.findOne({ userId: req.user.userId });
+    if (!student) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ học sinh");
+    }
+
+    // 2. Lấy tất cả classIds mà student đang ghi danh (active)
+    const enrollments = await Enrollment.find({
+      studentId: student._id,
+      status: "active",
+    }).select("classId");
+
+    const classIds = enrollments.map((e) => e.classId);
+
+    if (classIds.length === 0) {
+      return res.status(200).json({
+        message: "Bạn chưa ghi danh vào lớp nào",
+        schedules: [],
+      });
+    }
+
+    // 3. Lấy schedules của các lớp đó
+    const filter = {
+      classId: { $in: classIds },
+      status: { $in: ["scheduled", "makeup"] },
+    };
+
+    if (from || to) {
+      filter.date = {};
+      if (from) filter.date.$gte = new Date(from);
+      if (to) filter.date.$lte = new Date(to);
+    }
+
+    const schedules = await Schedule.find(filter)
+      .populate({
+        path: "classId",
+        select: "classCode room",
+        populate: { path: "courseId", select: "code name" },
+      })
+      .populate({
+        path: "teacherId",
+        select: "employeeCode",
+        populate: { path: "userId", select: "fullName" },
+      })
+      .sort({ date: 1, startTime: 1 });
+
+    res.status(200).json({
+      totalSessions: schedules.length,
+      schedules,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Parent xem lịch học của các con mình
+ * @route   GET /api/schedules/my-children?from=...&to=...
+ * @access  Private (Parent only)
+ *
+ * LUỒNG DỮ LIỆU:
+ *   req.user.userId → Parent.studentIds → Enrollment (active) → Schedule
+ *   Kết quả được nhóm theo từng con
+ */
+export const getChildrenSchedule = async (req, res, next) => {
+  try {
+    const { from, to } = req.query;
+
+    // 1. Tìm Parent profile, populate studentIds để lấy thông tin con
+    const parent = await Parent.findOne({ userId: req.user.userId }).populate({
+      path: "studentIds",
+      select: "studentCode",
+      populate: { path: "userId", select: "fullName" },
+    });
+
+    if (!parent) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ phụ huynh");
+    }
+
+    if (!parent.studentIds || parent.studentIds.length === 0) {
+      return res.status(200).json({
+        message: "Chưa có học sinh nào được liên kết",
+        children: [],
+      });
+    }
+
+    // 2. Với mỗi con, lấy enrollments → classIds → schedules
+    const children = [];
+
+    for (const student of parent.studentIds) {
+      const enrollments = await Enrollment.find({
+        studentId: student._id,
+        status: "active",
+      }).select("classId");
+
+      const classIds = enrollments.map((e) => e.classId);
+
+      let schedules = [];
+      if (classIds.length > 0) {
+        const filter = {
+          classId: { $in: classIds },
+          status: { $in: ["scheduled", "makeup"] },
+        };
+
+        if (from || to) {
+          filter.date = {};
+          if (from) filter.date.$gte = new Date(from);
+          if (to) filter.date.$lte = new Date(to);
+        }
+
+        schedules = await Schedule.find(filter)
+          .populate({
+            path: "classId",
+            select: "classCode room",
+            populate: { path: "courseId", select: "code name" },
+          })
+          .populate({
+            path: "teacherId",
+            select: "employeeCode",
+            populate: { path: "userId", select: "fullName" },
+          })
+          .sort({ date: 1, startTime: 1 });
+      }
+
+      children.push({
+        student: {
+          _id: student._id,
+          studentCode: student.studentCode,
+          fullName: student.userId?.fullName,
+        },
+        totalSessions: schedules.length,
+        schedules,
+      });
+    }
+
+    res.status(200).json({ children });
   } catch (error) {
     next(error);
   }
