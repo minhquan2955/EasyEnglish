@@ -1,3 +1,9 @@
 .env
 node_modules
 ams_technical_spec.html
+
+# AI Agent Temp & Backup Files
+.vibecode-backup/
+.vc-installed-files
+.vc-version
+install.sh

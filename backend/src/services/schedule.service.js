@@ -62,19 +62,38 @@ export const generateScheduleForClass = async (classId) => {
   const schedules = []; // Mảng chứa các buổi học sẽ tạo
   let sessionNumber = 1;
 
-  //Date manipulation trong JavaScript
-  //
-  // new Date(classDoc.startDate) — tạo bản sao để không ảnh hưởng đến DB
-  // currentDate.getDay()         — lấy thứ trong tuần (0=CN, 1=T2, ..., 6=T7)
-  // currentDate.setDate(...)     — di chuyển đến ngày tiếp theo
-  //
-  //JavaScript Date object là MUTABLE (thay đổi trực tiếp)
-  //khác với String/Number là immutable. Nên cần tạo bản sao bằng new Date().
+  // Lấy dữ liệu ngày ban đầu
   let currentDate = new Date(classDoc.startDate);
-  const endDate = new Date(classDoc.endDate);
+  const originEndDate = new Date(classDoc.endDate);
+
+  // Chuẩn hóa về UTC 00:00:00 để tránh sai lệch do Timezone/DST của Server
+  currentDate = new Date(
+    Date.UTC(
+      currentDate.getUTCFullYear(),
+      currentDate.getUTCMonth(),
+      currentDate.getUTCDate(),
+    ),
+  );
+  const endDate = new Date(
+    Date.UTC(
+      originEndDate.getUTCFullYear(),
+      originEndDate.getUTCMonth(),
+      originEndDate.getUTCDate(),
+    ),
+  );
+
+  let iterations = 0;
+  const MAX_ITERATIONS = 730; // Chặn tối đa vòng lặp 2 năm: thời lượng khóa học ko quá 2 năm
 
   while (currentDate <= endDate && sessionNumber <= totalSessions) {
-    const dayOfWeek = currentDate.getDay(); // 0-6
+    iterations++;
+    if (iterations > MAX_ITERATIONS) {
+      throw new Error(
+        `Thuật toán sinh lịch bị quá tải (vượt quá ${MAX_ITERATIONS} ngày). Vui lòng kiểm tra lại cấu hình ngày tháng.`,
+      );
+    }
+
+    const dayOfWeek = currentDate.getUTCDay(); // Sử dụng getUTCDay (0-6)
 
     // Kiểm tra ngày hiện tại có phải ngày học không
     if (daysOfWeek.includes(dayOfWeek)) {
@@ -87,7 +106,7 @@ export const generateScheduleForClass = async (classId) => {
         classId,
         teacherId: classDoc.teacherId,
         sessionNumber,
-        date: new Date(currentDate), //Tạo bản sao! Không push reference
+        date: new Date(currentDate), // Tạo bản sao ngày UTC chuẩn
         startTime,
         endTime,
         room: classDoc.room,
@@ -98,8 +117,15 @@ export const generateScheduleForClass = async (classId) => {
       sessionNumber++;
     }
 
-    // Di chuyển đến ngày tiếp theo
-    currentDate.setDate(currentDate.getDate() + 1);
+    // Di chuyển đến ngày tiếp theo an toàn trên hệ UTC
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+  }
+
+  // --- Áp dụng Cách A: Kiểm tra xem đã sinh đủ buổi học chưa ---
+  if (sessionNumber <= totalSessions) {
+    throw new Error(
+      `Khoảng thời gian từ ngày bắt đầu đến ngày kết thúc quá ngắn. Chỉ xếp được ${sessionNumber - 1}/${totalSessions} buổi học.`,
+    );
   }
 
   const createdSchedules = await Schedule.insertMany(schedules);
@@ -124,17 +150,23 @@ export const deleteSchedulesByClass = async (classId) => {
 
 export const autoCompleteExpiredSchedules = async () => {
   try {
+    // Tính toán mốc "Hôm nay ở GMT+7" độc lập với múi giờ của Server
     const now = new Date();
+    const gmt7Time = new Date(now.getTime() + 7 * 60 * 60 * 1000);
 
-    // Tạo mốc "đầu ngày hôm nay" (00:00:00) để phân biệt ngày hôm qua vs hôm nay
+    // Mốc "đầu ngày hôm nay" chuẩn UTC (khớp với kiểu lưu trữ của DB)
     const todayStart = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
+      Date.UTC(
+        gmt7Time.getUTCFullYear(),
+        gmt7Time.getUTCMonth(),
+        gmt7Time.getUTCDate(),
+      ),
     );
 
-    // Lấy giờ:phút hiện tại dạng "HH:MM" để so sánh với endTime
-    const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    // Lấy giờ:phút hiện tại ở GMT+7
+    const currentHour = String(gmt7Time.getUTCHours()).padStart(2, "0");
+    const currentMinute = String(gmt7Time.getUTCMinutes()).padStart(2, "0");
+    const currentTime = `${currentHour}:${currentMinute}`;
 
     // Cập nhật tất cả buổi học đã hết giờ
     // $or: thỏa MÃN 1 TRONG 2 điều kiện
