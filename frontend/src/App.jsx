@@ -6,6 +6,9 @@ import ChildrenEnglish from "./pages/ChildrenEnglish";
 import KindergartenEnglish from "./pages/KindergartenEnglish";
 import TeenEnglish from "./pages/TeenEnglish";
 import IeltsEnglish from "./pages/IeltsEnglish";
+import Centers from "./pages/Centers";
+import NewsAndEvents from "./pages/NewsAndEvents";
+import ParentsCorner from "./pages/ParentsCorner";
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
             <Route path="/tieng-anh-thieu-nhi" element={<ChildrenEnglish />} />
             <Route path="/tieng-anh-thieu-nien" element={<TeenEnglish />} />
             <Route path="/tieng-anh-ielts" element={<IeltsEnglish />} />
+            <Route path="/he-thong-trung-tam" element={<Centers />} />
+            <Route path="/tin-tuc-va-su-kien" element={<NewsAndEvents />} />
+            <Route path="/goc-phu-huynh" element={<ParentsCorner />} />
           </Routes>
         </div>
       </div>

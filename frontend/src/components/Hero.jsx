@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import RegistrationModal from "./RegistrationModal";
 
 export default function Hero() {
@@ -26,12 +27,12 @@ export default function Hero() {
                 Đăng ký tư vấn
               </button>
 
-              <a
-                href="#"
+              <Link
+                to="/about"
                 className="bg-transparent border border-ash-light hover:border-ink text-ink px-7 py-3 rounded-full font-bold text-[18px] transition-colors inline-block"
               >
                 Tìm hiểu thêm
-              </a>
+              </Link>
             </div>
           </div>
 

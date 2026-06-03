@@ -84,13 +84,21 @@ export default function Navbar() {
               </div>
             </li>
 
-            {['Hệ thống trung tâm', 'Tin tức & sự kiện', 'Góc phụ huynh'].map((item) => (
-              <li key={item}>
-                <a href="#" className="text-on-dark/80 hover:text-on-dark transition-colors py-2 block">
-                  {item}
-                </a>
-              </li>
-            ))}
+            <li>
+              <Link to="/he-thong-trung-tam" className="text-on-dark/80 hover:text-on-dark transition-colors py-2 block">
+                Hệ thống trung tâm
+              </Link>
+            </li>
+            <li>
+              <Link to="/tin-tuc-va-su-kien" className="text-on-dark/80 hover:text-on-dark transition-colors py-2 block">
+                Tin tức & sự kiện
+              </Link>
+            </li>
+            <li>
+              <Link to="/goc-phu-huynh" className="text-on-dark/80 hover:text-on-dark transition-colors py-2 block">
+                Góc phụ huynh
+              </Link>
+            </li>
           </ul>
 
           {/* CTA Button */}
