@@ -1,6 +1,8 @@
 import Attendance from "../models/Attendance.js";
 import Schedule from "../models/Schedule.js";
 import Enrollment from "../models/Enrollment.js";
+import Student from "../models/Student.js";
+import Parent from "../models/Parent.js";
 import { bulkCheckIn } from "../services/attendance.service.js";
 
 // ==================== BULK CHECK-IN ====================
@@ -217,6 +219,82 @@ export const updateAttendance = async (req, res, next) => {
       message: "Cập nhật điểm danh thành công",
       attendance: updatedAttendance,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+// ==================== STUDENT & PARENT ATTENDANCE ====================
+/**
+ * @desc    Student xem lịch sử điểm danh của mình
+ * @route   GET /api/attendances/my-attendance
+ * @access  Private (Student only)
+ */
+export const getMyAttendance = async (req, res, next) => {
+  try {
+    const student = await Student.findOne({ userId: req.user.userId });
+    if (!student) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ học sinh");
+    }
+
+    const attendances = await Attendance.find({ studentId: student._id })
+      .populate("scheduleId", "sessionNumber date startTime endTime topic")
+      .populate("classId", "classCode")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      totalRecords: attendances.length,
+      attendances,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Parent xem lịch sử điểm danh của con
+ * @route   GET /api/attendances/my-children
+ * @access  Private (Parent only)
+ */
+export const getChildrenAttendance = async (req, res, next) => {
+  try {
+    const parent = await Parent.findOne({ userId: req.user.userId }).populate({
+      path: "studentIds",
+      select: "studentCode",
+      populate: { path: "userId", select: "fullName" },
+    });
+
+    if (!parent) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ phụ huynh");
+    }
+
+    if (!parent.studentIds || parent.studentIds.length === 0) {
+      return res.status(200).json({
+        message: "Chưa có học sinh nào được liên kết",
+        children: [],
+      });
+    }
+
+    const children = [];
+    for (const student of parent.studentIds) {
+      const attendances = await Attendance.find({ studentId: student._id })
+        .populate("scheduleId", "sessionNumber date startTime endTime topic")
+        .populate("classId", "classCode")
+        .sort({ createdAt: -1 });
+
+      children.push({
+        student: {
+          _id: student._id,
+          studentCode: student.studentCode,
+          fullName: student.userId?.fullName,
+        },
+        totalRecords: attendances.length,
+        attendances,
+      });
+    }
+
+    res.status(200).json({ children });
   } catch (error) {
     next(error);
   }

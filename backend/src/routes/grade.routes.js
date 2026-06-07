@@ -14,6 +14,8 @@ import {
   deleteGrade,
   getGradesByStudent,
   getGradesByClass,
+  getMyGrades,
+  getChildrenGrades,
 } from "../controllers/grade.controller.js";
 
 const router = Router();
@@ -22,6 +24,8 @@ const router = Router();
 router.use(protect);
 
 // ---- Convenience routes (PHẢI đặt trước /:id) ----
+router.get("/my-grades", authorize("student"), getMyGrades);
+router.get("/my-children", authorize("parent"), getChildrenGrades);
 
 // Xem điểm 1 HS trong 1 lớp
 router.get(
