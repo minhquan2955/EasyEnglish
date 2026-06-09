@@ -1,0 +1,4 @@
+# Bỏ qua các thư mục của AI agents khỏi thống kê ngôn ngữ của GitHub
+.agents/** linguist-vendored
+.claude/** linguist-vendored
+.codex/** linguist-vendored
