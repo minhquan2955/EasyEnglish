@@ -3,6 +3,7 @@ import Class from "../models/Class.js";
 import Student from "../models/Student.js";
 import Teacher from "../models/Teacher.js";
 import Enrollment from "../models/Enrollment.js";
+import Parent from "../models/Parent.js";
 
 // ==================== CREATE ====================
 /**
@@ -402,6 +403,88 @@ export const getGradesByClass = async (req, res, next) => {
       },
       grades,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+// ==================== STUDENT & PARENT GRADES ====================
+/**
+ * @desc    Student xem điểm của mình
+ * @route   GET /api/grades/my-grades
+ * @access  Private (Student only)
+ */
+export const getMyGrades = async (req, res, next) => {
+  try {
+    const student = await Student.findOne({ userId: req.user.userId });
+    if (!student) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ học sinh");
+    }
+
+    const grades = await Grade.find({ studentId: student._id })
+      .populate({
+        path: "classId",
+        select: "classCode room",
+        populate: { path: "courseId", select: "name" },
+      })
+      .sort({ gradedAt: -1 });
+
+    res.status(200).json({
+      totalGrades: grades.length,
+      grades,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Parent xem điểm của con
+ * @route   GET /api/grades/my-children
+ * @access  Private (Parent only)
+ */
+export const getChildrenGrades = async (req, res, next) => {
+  try {
+    const parent = await Parent.findOne({ userId: req.user.userId }).populate({
+      path: "studentIds",
+      select: "studentCode",
+      populate: { path: "userId", select: "fullName" },
+    });
+
+    if (!parent) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ phụ huynh");
+    }
+
+    if (!parent.studentIds || parent.studentIds.length === 0) {
+      return res.status(200).json({
+        message: "Chưa có học sinh nào được liên kết",
+        children: [],
+      });
+    }
+
+    const children = [];
+    for (const student of parent.studentIds) {
+      const grades = await Grade.find({ studentId: student._id })
+        .populate({
+          path: "classId",
+          select: "classCode room",
+          populate: { path: "courseId", select: "name" },
+        })
+        .sort({ gradedAt: -1 });
+
+      children.push({
+        student: {
+          _id: student._id,
+          studentCode: student.studentCode,
+          fullName: student.userId?.fullName,
+        },
+        totalGrades: grades.length,
+        grades,
+      });
+    }
+
+    res.status(200).json({ children });
   } catch (error) {
     next(error);
   }

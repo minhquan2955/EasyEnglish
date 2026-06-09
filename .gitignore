@@ -7,3 +7,6 @@ ams_technical_spec.html
 .vc-installed-files
 .vc-version
 install.sh
+.agents/
+.claude/
+.codex/

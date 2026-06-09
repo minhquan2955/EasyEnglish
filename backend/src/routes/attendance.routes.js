@@ -12,6 +12,8 @@ import {
   getAttendances,
   getAttendanceById,
   updateAttendance,
+  getMyAttendance,
+  getChildrenAttendance,
 } from "../controllers/attendance.controller.js";
 
 const router = Router();
@@ -20,6 +22,8 @@ const router = Router();
 router.use(protect);
 
 // ---- Route đặc biệt (PHẢI đặt trước /:id) ----
+router.get("/my-attendance", authorize("student"), getMyAttendance);
+router.get("/my-children", authorize("parent"), getChildrenAttendance);
 
 // Điểm danh hàng loạt
 router.post(
