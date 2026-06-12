@@ -634,3 +634,63 @@ export const getChildrenSchedule = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Lấy tổng quan lịch học của tất cả lớp
+ * @route   GET /api/admin/schedules
+ * @access  Private (Admin only)
+ */
+export const getAllSchedules = async (req, res, next) => {
+  try {
+    // Group by classId to show summary
+    const summary = await Schedule.aggregate([
+      {
+        $group: {
+          _id: "$classId",
+          totalSessions: { $sum: 1 },
+          scheduled: { $sum: { $cond: [{ $eq: ["$status", "scheduled"] }, 1, 0] } },
+          completed: { $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] } },
+          cancelled: { $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] } },
+          firstDate: { $min: "$date" },
+          lastDate: { $max: "$date" },
+        },
+      },
+      {
+        $lookup: {
+          from: "classes",
+          localField: "_id",
+          foreignField: "_id",
+          as: "classInfo",
+        },
+      },
+      { $unwind: "$classInfo" },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "classInfo.courseId",
+          foreignField: "_id",
+          as: "courseInfo",
+        },
+      },
+      { $unwind: { path: "$courseInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          classId: "$_id",
+          classCode: "$classInfo.classCode",
+          courseName: "$courseInfo.name",
+          totalSessions: 1,
+          scheduled: 1,
+          completed: 1,
+          cancelled: 1,
+          firstDate: 1,
+          lastDate: 1,
+        },
+      },
+      { $sort: { firstDate: -1 } },
+    ]);
+
+    res.status(200).json({ schedules: summary });
+  } catch (error) {
+    next(error);
+  }
+};

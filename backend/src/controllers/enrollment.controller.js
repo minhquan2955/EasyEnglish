@@ -58,13 +58,20 @@ export const createEnrollment = async (req, res, next) => {
         `Lớp đã đạt sĩ số tối đa (${classDoc.maxStudents} học sinh)`,
       );
     }
-    // --- 6. Tạo enrollment ---
-    const enrollment = await Enrollment.create({
-      studentId,
-      classId,
-      enrollDate,
-      notes,
-    });
+    // --- 6. Tạo hoặc Khôi phục enrollment ---
+    // Sử dụng findOneAndUpdate để xử lý trường hợp HS đã từng ghi danh nhưng bị Xóa (status: dropped)
+    // Nếu dùng .create(), sẽ bị lỗi Duplicate Key vì có index {studentId, classId}
+    const enrollment = await Enrollment.findOneAndUpdate(
+      { studentId, classId },
+      {
+        $set: {
+          enrollDate,
+          notes,
+          status: "active" // Cập nhật lại status thành active
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
     // Populate để trả về thông tin đầy đủ
     const populatedEnrollment = await Enrollment.findById(enrollment._id)
       .populate({

@@ -37,6 +37,8 @@ export const createCourseSchema = z.object({
     .number({ required_error: "Học phí là bắt buộc" })
     .positive("Học phí phải là số dương"),
 
+  status: z.enum(["active", "inactive"]).optional(),
+
   // curriculum là mảng, không bắt buộc khi tạo (có thể thêm sau)
   curriculum: z
     .array(
