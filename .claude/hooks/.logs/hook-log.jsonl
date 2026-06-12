@@ -1,0 +1,4 @@
+{"ts":"2026-06-03T16:27:23.054Z","hook":"session-init","event":"SessionStart","tool":"","target":"","note":"startup","dur":126,"status":"ok","exit":0,"error":""}
+{"ts":"2026-06-03T16:31:56.597Z","hook":"session-init","event":"SessionStart","tool":"","target":"","note":"startup","dur":150,"status":"ok","exit":0,"error":""}
+{"ts":"2026-06-03T16:41:40.659Z","hook":"session-init","event":"SessionStart","tool":"","target":"","note":"startup","dur":180,"status":"ok","exit":0,"error":""}
+{"ts":"2026-06-03T16:42:53.652Z","hook":"session-init","event":"SessionStart","tool":"","target":"","note":"startup","dur":159,"status":"ok","exit":0,"error":""}
