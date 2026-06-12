@@ -285,6 +285,44 @@ export const updateUserStatus = async (req, res, next) => {
 };
 
 /**
+ * @desc    Admin cập nhật thông tin cơ bản của người dùng
+ * @route   PUT /api/admin/users/:id
+ * @access  Private (Admin only)
+ */
+export const updateUser = async (req, res, next) => {
+  try {
+    const { fullName, phone, role, status } = req.body;
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(404);
+      throw new Error("Không tìm thấy người dùng");
+    }
+
+    if (fullName) user.fullName = fullName;
+    if (phone !== undefined) user.phone = phone; // Allow empty phone
+    if (role) user.role = role;
+    if (status) user.status = status;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Cập nhật người dùng thành công",
+      user: {
+        _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        phone: user.phone,
+        status: user.status
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Admin liên kết phụ huynh với học sinh
  * @route   POST /api/admin/students/:id/link-parent
  * @access  Private (Admin only)

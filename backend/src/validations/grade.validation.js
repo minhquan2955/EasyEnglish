@@ -97,3 +97,45 @@ export const updateGradeSchema = z
       path: ["score"],
     },
   );
+
+/**
+ * Schema validate cho thao tác NHẬP ĐIỂM HÀNG LOẠT (Batch Grading)
+ * Dùng để nhập điểm cho 1 bài kiểm tra (Exam) cho nhiều học sinh cùng lúc
+ */
+export const batchGradeSchema = z.object({
+  assessmentType: z.enum(
+    ["midterm", "final", "quiz", "homework", "speaking", "writing"],
+    {
+      errorMap: () => ({
+        message:
+          "Loại bài phải là: midterm, final, quiz, homework, speaking, hoặc writing",
+      }),
+    }
+  ),
+  title: z
+    .string({ required_error: "Tên bài kiểm tra là bắt buộc" })
+    .min(1, "Tên bài không được để trống")
+    .max(200, "Tên bài không quá 200 ký tự"),
+  maxScore: z
+    .number({ required_error: "Điểm tối đa là bắt buộc" })
+    .min(1, "Điểm tối đa phải lớn hơn 0"),
+  
+  scores: z.array(
+    z.object({
+      studentId: z.string().length(24, "studentId không hợp lệ"),
+      score: z.number().min(0, "Điểm không được âm").optional(), // Có thể để trống nếu học sinh vắng
+      feedback: z.string().max(1000, "Nhận xét không quá 1000 ký tự").optional(),
+    })
+  ).min(1, "Phải nhập điểm cho ít nhất 1 học sinh (để lưu thông tin bài kiểm tra)") 
+}).refine((data) => {
+  // Validate cross-field: tất cả các score trong mảng phải <= maxScore của đề thi
+  for (const s of data.scores) {
+    if (s.score !== undefined && s.score > data.maxScore) {
+      return false;
+    }
+  }
+  return true;
+}, {
+  message: "Điểm của học sinh không được vượt quá điểm tối đa",
+  path: ["scores"]
+});

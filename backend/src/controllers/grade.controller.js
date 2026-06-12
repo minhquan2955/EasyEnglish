@@ -3,6 +3,8 @@ import Class from "../models/Class.js";
 import Student from "../models/Student.js";
 import Teacher from "../models/Teacher.js";
 import Enrollment from "../models/Enrollment.js";
+import Parent from "../models/Parent.js";
+import mongoose from "mongoose";
 
 // ==================== CREATE ====================
 /**
@@ -65,7 +67,9 @@ export const createGrade = async (req, res, next) => {
     const teacher = await Teacher.findOne({ userId: req.user.userId });
     if (!teacher) {
       res.status(403);
-      throw new Error("Tài khoản này không phải giáo viên, không thể chấm điểm");
+      throw new Error(
+        "Tài khoản này không phải giáo viên, không thể chấm điểm",
+      );
     }
 
     // --- Tạo bản ghi điểm ---
@@ -401,6 +405,261 @@ export const getGradesByClass = async (req, res, next) => {
             : 0,
       },
       grades,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// ==================== STUDENT & PARENT GRADES ====================
+/**
+ * @desc    Student xem điểm của mình
+ * @route   GET /api/grades/my-grades
+ * @access  Private (Student only)
+ */
+export const getMyGrades = async (req, res, next) => {
+  try {
+    const student = await Student.findOne({ userId: req.user.userId });
+    if (!student) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ học sinh");
+    }
+
+    const grades = await Grade.find({ studentId: student._id })
+      .populate({
+        path: "classId",
+        select: "classCode room",
+        populate: [
+          { path: "courseId", select: "name" },
+          { 
+            path: "teacherId", 
+            select: "employeeCode",
+            populate: { path: "userId", select: "fullName" }
+          }
+        ],
+      })
+      .populate({
+        path: "gradedBy",
+        select: "employeeCode",
+        populate: { path: "userId", select: "fullName" },
+      })
+      .sort({ gradedAt: -1 });
+
+    res.status(200).json({
+      totalGrades: grades.length,
+      grades,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Parent xem điểm của con
+ * @route   GET /api/grades/my-children
+ * @access  Private (Parent only)
+ */
+export const getChildrenGrades = async (req, res, next) => {
+  try {
+    const parent = await Parent.findOne({ userId: req.user.userId }).populate({
+      path: "studentIds",
+      select: "studentCode",
+      populate: { path: "userId", select: "fullName" },
+    });
+
+    if (!parent) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ phụ huynh");
+    }
+
+    if (!parent.studentIds || parent.studentIds.length === 0) {
+      return res.status(200).json({
+        message: "Chưa có học sinh nào được liên kết",
+        children: [],
+      });
+    }
+
+    const children = [];
+    for (const student of parent.studentIds) {
+      const grades = await Grade.find({ studentId: student._id })
+        .populate({
+          path: "classId",
+          select: "classCode room",
+          populate: [
+            { path: "courseId", select: "name" },
+            { 
+              path: "teacherId", 
+              select: "employeeCode",
+              populate: { path: "userId", select: "fullName" }
+            }
+          ],
+        })
+        .populate({
+          path: "gradedBy",
+          select: "employeeCode",
+          populate: { path: "userId", select: "fullName" },
+        })
+        .sort({ gradedAt: -1 });
+
+      children.push({
+        student: {
+          _id: student._id,
+          studentCode: student.studentCode,
+          fullName: student.userId?.fullName,
+        },
+        totalGrades: grades.length,
+        grades,
+      });
+    }
+
+    res.status(200).json({ children });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==================== EXAM & BATCH GRADING (Dùng chung Grade schema) ====================
+/**
+ * @desc    Lấy danh sách các bài kiểm tra của một lớp (Gom nhóm từ Grade)
+ * @route   GET /api/grades/class/:classId/exams
+ * @access  Private (Admin, Teacher)
+ */
+export const getExamsByClass = async (req, res, next) => {
+  try {
+    const { classId } = req.params;
+
+    // Phải convert sang ObjectId để aggregate match hoạt động
+
+    const classIdObj = new mongoose.Types.ObjectId(classId);
+
+    const exams = await Grade.aggregate([
+      { $match: { classId: classIdObj } },
+      {
+        $group: {
+          _id: {
+            title: "$title",
+            assessmentType: "$assessmentType",
+            maxScore: "$maxScore",
+          },
+          createdAt: { $min: "$createdAt" },
+          gradedBy: { $first: "$gradedBy" },
+          studentCount: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: "teachers",
+          localField: "gradedBy",
+          foreignField: "_id",
+          as: "teacherInfo",
+        },
+      },
+      { $unwind: { path: "$teacherInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "teacherInfo.userId",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          title: "$_id.title",
+          assessmentType: "$_id.assessmentType",
+          maxScore: "$_id.maxScore",
+          createdAt: 1,
+          studentCount: 1,
+          gradedBy: "$userInfo.fullName",
+        },
+      },
+      { $sort: { createdAt: -1 } },
+    ]);
+
+    res.status(200).json({ exams });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Nhập/Cập nhật điểm hàng loạt cho 1 bài kiểm tra
+ * @route   POST /api/grades/class/:classId/exam
+ * @access  Private (Admin, Teacher)
+ */
+export const batchGradeExam = async (req, res, next) => {
+  try {
+    const { classId } = req.params;
+    const { assessmentType, title, maxScore, scores } = req.body;
+
+    // --- Kiểm tra lớp học tồn tại ---
+    const classDoc = await Class.findById(classId);
+    if (!classDoc) {
+      res.status(404);
+      throw new Error("Không tìm thấy lớp học");
+    }
+
+    // --- Kiểm tra quyền Teacher ---
+    let teacherId = null;
+    if (req.user.role === "teacher") {
+      const teacher = await Teacher.findOne({ userId: req.user.userId });
+      if (!teacher) {
+        res.status(403);
+        throw new Error("Tài khoản này không phải giáo viên");
+      }
+      // Nếu không phải là giáo viên của lớp, chặn
+      if (classDoc.teacherId.toString() !== teacher._id.toString()) {
+        res.status(403);
+        throw new Error(
+          "Bạn không được phép nhập điểm cho lớp của giáo viên khác",
+        );
+      }
+      teacherId = teacher._id;
+    } else if (req.user.role === "admin") {
+      // Nếu admin chấm điểm thay, gán gradedBy bằng giáo viên của lớp đó
+      teacherId = classDoc.teacherId;
+    }
+
+    // --- Prepare BulkWrite Operations ---
+    // Update nếu học sinh đã có điểm cho bài này, Insert nếu chưa có
+    const bulkOps = scores.map((s) => {
+      // Nếu score là undefined (bỏ trống), có thể người dùng muốn bỏ qua không chấm
+      // Nhưng schema batchGradeSchema yêu cầu scores là mảng, ta lọc những bạn có điểm
+      return {
+        updateOne: {
+          filter: { studentId: s.studentId, classId, assessmentType, title },
+          update: {
+            $set: {
+              score: s.score,
+              maxScore,
+              feedback: s.feedback,
+              gradedBy: teacherId,
+              gradedAt: new Date(),
+            },
+          },
+          upsert: true, // Nếu chưa có thì insert
+        },
+      };
+    });
+
+    // Lọc ra các học sinh có score !== undefined (để tránh lưu điểm trống)
+    const validOps = bulkOps.filter(
+      (op) => op.updateOne.update.$set.score !== undefined,
+    );
+
+    if (validOps.length === 0) {
+      res.status(400);
+      throw new Error("Không có điểm hợp lệ nào để lưu");
+    }
+
+    const result = await Grade.bulkWrite(validOps);
+
+    res.status(200).json({
+      message: "Lưu bảng điểm thành công",
+      result: {
+        inserted: result.upsertedCount,
+        updated: result.modifiedCount,
+      },
     });
   } catch (error) {
     next(error);

@@ -45,6 +45,8 @@ export const createClassSchema = z.object({
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
 
+  status: z.enum(["active", "inactive", "completed"]).optional(),
+
   // schedule là một nested object (object lồng bên trong object)
   schedule: z
     .object({
