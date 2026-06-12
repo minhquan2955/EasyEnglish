@@ -93,6 +93,18 @@ export const getClasses = async (req, res, next) => {
     if (courseId) filter.courseId = courseId;
     if (teacherId) filter.teacherId = teacherId;
     if (status) filter.status = status;
+
+    // Filter by logged in teacher
+    if (req.user && req.user.role === "teacher") {
+      const Teacher = (await import("../models/Teacher.js")).default;
+      const teacherDoc = await Teacher.findOne({ userId: req.user.userId });
+      
+      if (!teacherDoc) {
+        return res.status(200).json({ classes: [], total: 0 });
+      }
+      filter.teacherId = teacherDoc._id;
+    }
+
     const skip = (page - 1) * limit;
     const [classes, total] = await Promise.all([
       Class.find(filter)

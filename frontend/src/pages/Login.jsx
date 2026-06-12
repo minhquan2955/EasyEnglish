@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeSlash, EnvelopeSimple, Lock, CircleNotch } from '@phosphor-icons/react';
-import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Eye,
+  EyeSlash,
+  EnvelopeSimple,
+  Lock,
+  CircleNotch,
+} from "@phosphor-icons/react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,32 +16,28 @@ export default function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      navigate("/profile", { replace: true });
     }
   }, [isLoading, isAuthenticated, navigate]);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Client-side validation
   const validateForm = () => {
     if (!email.trim()) {
-      setError('Vui lòng nhập email');
+      setError("Vui lòng nhập email");
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Email không hợp lệ');
+      setError("Email không hợp lệ");
       return false;
     }
     if (!password) {
-      setError('Vui lòng nhập mật khẩu');
-      return false;
-    }
-    if (password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      setError("Vui lòng nhập mật khẩu");
       return false;
     }
     return true;
@@ -43,45 +45,48 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validateForm()) return;
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Đăng nhập thất bại');
+        throw new Error(data.message || "Đăng nhập thất bại");
       }
 
       // Save auth data
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify({
-        _id: data._id,
-        email: data.email,
-        fullName: data.fullName,
-        role: data.role,
-        phone: data.phone,
-      }));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          _id: data._id,
+          email: data.email,
+          fullName: data.fullName,
+          role: data.role,
+          phone: data.phone,
+        }),
+      );
 
       // Dispatch custom event for AuthContext to pick up
-      window.dispatchEvent(new Event('auth-change'));
+      window.dispatchEvent(new Event("auth-change"));
 
       // Redirect based on role
-      if (data.role === 'admin') {
-        navigate('/dashboard');
+      if (data.role === "admin") {
+        navigate("/dashboard");
       } else {
-        navigate('/profile');
+        navigate("/profile");
       }
     } catch (err) {
-      setError(err.message || 'Có lỗi xảy ra, vui lòng thử lại');
+      setError(err.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setLoading(false);
     }
@@ -90,10 +95,8 @@ export default function Login() {
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 bg-canvas-light">
       <div className="w-full max-w-[420px]">
-
         {/* Form Card */}
         <div className="bg-surface-card rounded-[8px] border border-hairline-light p-8">
-
           {/* Header */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
@@ -112,16 +115,24 @@ export default function Login() {
           {/* Error Message */}
           {error && (
             <div className="mb-6 flex items-start gap-2 px-4 py-3 rounded-[4px] bg-[#c81b3a]/10">
-              <span className="text-[14px] text-[#c81b3a] leading-[1.5]">{error}</span>
+              <span className="text-[14px] text-[#c81b3a] leading-[1.5]">
+                {error}
+              </span>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6" id="login-form">
-
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-6"
+            id="login-form"
+          >
             {/* Email Field */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="login-email" className="text-[14px] font-medium text-ink tracking-[0.324px]">
+              <label
+                htmlFor="login-email"
+                className="text-[14px] font-medium text-ink tracking-[0.324px]"
+              >
                 Email
               </label>
               <div className="relative">
@@ -133,7 +144,10 @@ export default function Login() {
                   id="login-email"
                   type="email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError("");
+                  }}
                   placeholder="you@example.com"
                   autoComplete="email"
                   className="w-full h-[48px] pl-11 pr-4 bg-canvas-light text-ink text-[18px] leading-[1.5] tracking-[0.1px] rounded-[4px] border border-ash-light outline-none transition-[border-color] duration-200 placeholder:text-ash-light focus:border-2 focus:border-ps-blue focus:pl-[calc(2.75rem-1px)] focus:pr-[calc(1rem-1px)]"
@@ -143,7 +157,10 @@ export default function Login() {
 
             {/* Password Field */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="login-password" className="text-[14px] font-medium text-ink tracking-[0.324px]">
+              <label
+                htmlFor="login-password"
+                className="text-[14px] font-medium text-ink tracking-[0.324px]"
+              >
                 Mật khẩu
               </label>
               <div className="relative">
@@ -153,9 +170,12 @@ export default function Login() {
                 />
                 <input
                   id="login-password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
                   placeholder="Nhập mật khẩu"
                   autoComplete="current-password"
                   className="w-full h-[48px] pl-11 pr-12 bg-canvas-light text-ink text-[18px] leading-[1.5] tracking-[0.1px] rounded-[4px] border border-ash-light outline-none transition-[border-color] duration-200 placeholder:text-ash-light focus:border-2 focus:border-ps-blue focus:pl-[calc(2.75rem-1px)] focus:pr-[calc(3rem-1px)]"
@@ -165,7 +185,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-ash-light hover:text-ink transition-colors"
                   tabIndex={-1}
-                  aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                  aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                 >
                   {showPassword ? <EyeSlash size={20} /> : <Eye size={20} />}
                 </button>
@@ -185,7 +205,7 @@ export default function Login() {
                   <span>Đang đăng nhập...</span>
                 </>
               ) : (
-                'Đăng nhập'
+                "Đăng nhập"
               )}
             </button>
           </form>

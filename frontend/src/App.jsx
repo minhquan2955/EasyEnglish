@@ -13,6 +13,22 @@ import Profile from "./pages/Profile";
 import Account from "./pages/Account";
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
+import Dashboard from "./pages/Dashboard";
+import Course from "./pages/Course";
+import Class from "./pages/Class";
+import Student from "./pages/Student";
+import Teacher from "./pages/Teacher";
+import Parent from "./pages/Parent";
+import Schedule from "./pages/Schedule";
+import Grade from "./pages/Grade";
+import Enrollment from "./pages/Enrollment";
+import MySchedule from "./pages/MySchedule";
+import MyGrades from "./pages/MyGrades";
+import ChildrenSchedule from "./pages/ChildrenSchedule";
+import ChildrenGrades from "./pages/ChildrenGrades";
+import Attendance from "./pages/Attendance";
+import MyAttendance from "./pages/MyAttendance";
+import ChildrenAttendance from "./pages/ChildrenAttendance";
 
 function App() {
   return (
@@ -34,30 +50,30 @@ function App() {
 
         {/* Authenticated Routes with Sidebar */}
         <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<div className="p-4">Trang tổng quan (Coming soon)</div>} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/account" element={<Account />} />
           {/* Admin & Shared Management Routes */}
-          <Route path="/quan-ly-khoa-hoc" element={<div className="p-4">Quản lý khóa học (Coming soon)</div>} />
-          <Route path="/quan-ly-lop-hoc" element={<div className="p-4">Quản lý lớp học (Coming soon)</div>} />
-          <Route path="/quan-ly-lich-hoc" element={<div className="p-4">Quản lý lịch học (Coming soon)</div>} />
+          <Route path="/quan-ly-khoa-hoc" element={<Course />} />
+          <Route path="/quan-ly-lop-hoc" element={<Class />} />
+          <Route path="/quan-ly-lich-hoc" element={<Schedule />} />
           <Route path="/quan-ly-nguoi-dung" element={<div className="p-4">Quản lý người dùng (Coming soon)</div>} />
-          <Route path="/quan-ly-hoc-sinh" element={<div className="p-4">Quản lý học sinh (Coming soon)</div>} />
-          <Route path="/quan-ly-giao-vien" element={<div className="p-4">Quản lý giáo viên (Coming soon)</div>} />
-          <Route path="/quan-ly-phu-huynh" element={<div className="p-4">Quản lý phụ huynh (Coming soon)</div>} />
-          <Route path="/quan-ly-ky-thi" element={<div className="p-4">Quản lý kỳ thi (Coming soon)</div>} />
-          <Route path="/quan-ly-diem-danh" element={<div className="p-4">Quản lý điểm danh (Coming soon)</div>} />
-          <Route path="/quan-ly-ghi-danh" element={<div className="p-4">Quản lý ghi danh (Coming soon)</div>} />
+          <Route path="/quan-ly-hoc-sinh" element={<Student />} />
+          <Route path="/quan-ly-giao-vien" element={<Teacher />} />
+          <Route path="/quan-ly-phu-huynh" element={<Parent />} />
+          <Route path="/quan-ly-ky-thi" element={<Grade />} />
+          <Route path="/quan-ly-diem-danh" element={<Attendance />} />
+          <Route path="/quan-ly-ghi-danh" element={<Enrollment />} />
 
           {/* Student Specific Routes */}
-          <Route path="/my-schedule" element={<div className="p-4">Lịch học của tôi (Coming soon)</div>} />
-          <Route path="/my-grades" element={<div className="p-4">Bảng điểm của tôi (Coming soon)</div>} />
-          <Route path="/my-attendance" element={<div className="p-4">Lịch sử điểm danh (Coming soon)</div>} />
+          <Route path="/my-schedule" element={<MySchedule />} />
+          <Route path="/my-grades" element={<MyGrades />} />
+          <Route path="/my-attendance" element={<MyAttendance />} />
 
           {/* Parent Specific Routes */}
-          <Route path="/children-schedule" element={<div className="p-4">Lịch học của con (Coming soon)</div>} />
-          <Route path="/children-grades" element={<div className="p-4">Điểm số của con (Coming soon)</div>} />
-          <Route path="/children-attendance" element={<div className="p-4">Điểm danh của con (Coming soon)</div>} />
+          <Route path="/children-schedule" element={<ChildrenSchedule />} />
+          <Route path="/children-grades" element={<ChildrenGrades />} />
+          <Route path="/children-attendance" element={<ChildrenAttendance />} />
         </Route>
       </Routes>
     </BrowserRouter>

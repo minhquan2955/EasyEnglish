@@ -61,4 +61,19 @@ router.put(
 // Chỉ Admin mới được xóa điểm
 router.delete("/:id", authorize("admin"), deleteGrade);
 
+// ==================== BATCH EXAM ROUTES ====================
+import { batchGradeSchema } from "../validations/grade.validation.js";
+import { getExamsByClass, batchGradeExam } from "../controllers/grade.controller.js";
+
+// Lấy danh sách các bài kiểm tra của một lớp
+router.get("/class/:classId/exams", authorize("admin", "teacher"), getExamsByClass);
+
+// Lưu điểm cho một bài kiểm tra
+router.post(
+  "/class/:classId/exam",
+  authorize("admin", "teacher"),
+  validate(batchGradeSchema),
+  batchGradeExam
+);
+
 export default router;
