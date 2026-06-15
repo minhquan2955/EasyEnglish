@@ -11,7 +11,8 @@ import {
   User,
   IdentificationCard,
   CheckSquareOffset,
-  Books
+  Books,
+  EnvelopeSimple
 } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 
@@ -34,6 +35,7 @@ const getSidebarItems = (role) => {
       { name: 'Exam & Grades', path: '/quan-ly-ky-thi', icon: ClipboardText },
       { name: 'Attendance', path: '/quan-ly-diem-danh', icon: CheckSquareOffset },
       { name: 'Enrollment', path: '/quan-ly-ghi-danh', icon: IdentificationCard },
+      { name: 'Registration', path: '/quan-ly-dang-ky', icon: EnvelopeSimple },
     ];
   }
 

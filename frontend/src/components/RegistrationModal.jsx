@@ -6,6 +6,8 @@ export default function RegistrationModal({
   onClose,
 }) {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     parentName: "",
     phone: "",
@@ -22,6 +24,7 @@ export default function RegistrationModal({
     // Reset state after a short delay so the closing animation (if any) looks smooth
     setTimeout(() => {
       setIsSuccess(false);
+      setError("");
       setFormData({
         parentName: "",
         phone: "",
@@ -33,11 +36,39 @@ export default function RegistrationModal({
     }, 300);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Send data to backend API
-    console.log("Form submitted:", formData);
-    setIsSuccess(true);
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/registrations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          parentName: formData.parentName,
+          phone: formData.phone,
+          email: formData.email,
+          childName: formData.childName,
+          childAge: formData.childAge ? Number(formData.childAge) : undefined,
+          notes: formData.notes,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setIsSuccess(true);
+      } else {
+        setError(data.message || "Đăng ký không thành công. Vui lòng thử lại.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Lỗi kết nối hệ thống. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -85,6 +116,11 @@ export default function RegistrationModal({
         ) : (
           /* Form View */
           <form onSubmit={handleSubmit} className="p-6">
+            {error && (
+              <div className="mb-5 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[4px] text-sm">
+                {error}
+              </div>
+            )}
             <div className="grid md:grid-cols-2 gap-5 mb-6">
               <div className="flex flex-col gap-2">
                 <label htmlFor="parentName" className="text-[14px] font-bold">
@@ -186,15 +222,17 @@ export default function RegistrationModal({
               <button
                 type="button"
                 onClick={handleClose}
-                className="bg-transparent border border-ash-light hover:border-ink text-ink px-7 py-3 rounded-full font-bold text-[14px] transition-colors"
+                disabled={loading}
+                className="bg-transparent border border-ash-light hover:border-ink text-ink px-7 py-3 rounded-full font-bold text-[14px] transition-colors disabled:opacity-50"
               >
                 Hủy
               </button>
               <button
                 type="submit"
-                className="bg-ps-blue hover:bg-ps-blue-pressed text-on-dark px-7 py-3 rounded-full font-bold text-[14px] transition-colors"
+                disabled={loading}
+                className="bg-ps-blue hover:bg-ps-blue-pressed text-on-dark px-7 py-3 rounded-full font-bold text-[14px] transition-colors disabled:opacity-50"
               >
-                Gửi thông tin
+                {loading ? "Đang gửi..." : "Gửi thông tin"}
               </button>
             </div>
           </form>

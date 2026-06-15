@@ -151,7 +151,7 @@ export default function Navbar() {
                     </div>
 
                     <Link
-                      to="/dashboard"
+                      to="/profile"
                       onClick={() => setIsUserMenuOpen(false)}
                       className="px-4 py-2.5 text-[14px] text-on-dark/80 hover:bg-surface-dark-elevated hover:text-on-dark transition-colors rounded-sm flex items-center gap-2"
                     >

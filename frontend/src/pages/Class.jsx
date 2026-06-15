@@ -308,7 +308,9 @@ export default function Class() {
                         <td className="py-4 text-gray-300">{cls.courseId?.name || '-'}</td>
                         <td className="py-4 text-gray-300">{cls.teacherId?.userId?.fullName || '-'}</td>
                         <td className="py-4 text-gray-400">{cls.room || '-'}</td>
-                        <td className="py-4 text-gray-400">{cls.maxStudents}</td>
+                        <td className="py-4 text-gray-400">
+                          {cls.studentCount !== undefined ? `${cls.studentCount} / ${cls.maxStudents}` : cls.maxStudents}
+                        </td>
                         <td className="py-4 text-gray-400">
                           {cls.startDate ? new Date(cls.startDate).toLocaleDateString('vi-VN') : '-'}
                         </td>

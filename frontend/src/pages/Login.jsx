@@ -79,12 +79,8 @@ export default function Login() {
       // Dispatch custom event for AuthContext to pick up
       window.dispatchEvent(new Event("auth-change"));
 
-      // Redirect based on role
-      if (data.role === "admin") {
-        navigate("/dashboard");
-      } else {
-        navigate("/profile");
-      }
+      // Redirect to profile page after successful login
+      navigate("/profile");
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {

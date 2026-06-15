@@ -71,25 +71,26 @@ export default function Attendance() {
           },
         );
 
-        // Fetch enrollments
+        // Fetch enrollments (note: route ends with /students)
         const resEnroll = await fetch(
-          `/api/enrollments/class/${selectedClass._id}`,
+          `/api/enrollments/class/${selectedClass._id}/students`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
 
-        if (resSchedule.ok && resEnroll.ok) {
+        if (resSchedule.ok) {
           const scheduleData = await resSchedule.json();
-          const enrollData = await resEnroll.json();
-
           // Sort schedules by date desc
           const sortedSchedules = (scheduleData.schedules || []).sort(
             (a, b) => new Date(b.date) - new Date(a.date),
           );
           setSchedules(sortedSchedules);
+        }
 
-          setEnrollments(enrollData.enrollments || []);
+        if (resEnroll.ok) {
+          const enrollData = await resEnroll.json();
+          setEnrollments(enrollData.students || []);
         }
       } catch (err) {
         setError("Lỗi khi tải dữ liệu lớp học");

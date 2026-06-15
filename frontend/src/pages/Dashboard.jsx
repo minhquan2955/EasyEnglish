@@ -13,8 +13,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [period, setPeriod] = useState("month");
   const [stats, setStats] = useState({
     totals: { students: 0, teachers: 0, parents: 0 },
@@ -24,6 +26,10 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (user?.role !== "admin") {
+      setLoading(false);
+      return;
+    }
     const fetchStats = async () => {
       setLoading(true);
       try {
@@ -52,7 +58,15 @@ const Dashboard = () => {
     };
 
     fetchStats();
-  }, [period]);
+  }, [period, user]);
+
+  if (user?.role !== "admin") {
+    return (
+      <div className="p-8 text-center text-gray-400">
+        Bạn không có quyền truy cập trang này. Chỉ Admin mới có quyền truy cập Dashboard.
+      </div>
+    );
+  }
 
   const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div

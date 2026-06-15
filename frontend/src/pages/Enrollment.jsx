@@ -287,7 +287,7 @@ export default function Enrollment() {
                     </div>
                     <div className="flex items-center gap-4 text-xs text-gray-500 mt-4">
                       <div className="flex items-center gap-1">
-                        Sĩ số tối đa: {cls.maxStudents}
+                        Sĩ số: {cls.studentCount !== undefined ? `${cls.studentCount} / ${cls.maxStudents}` : `Tối đa ${cls.maxStudents}`}
                       </div>
                       <div className="flex items-center gap-1 text-ps-blue">
                         {cls.status === 'active' ? 'Đang hoạt động' : 'Đã đóng'}

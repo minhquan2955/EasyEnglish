@@ -22,6 +22,7 @@ import Parent from "./pages/Parent";
 import Schedule from "./pages/Schedule";
 import Grade from "./pages/Grade";
 import Enrollment from "./pages/Enrollment";
+import RegistrationManagement from "./pages/RegistrationManagement";
 import MySchedule from "./pages/MySchedule";
 import MyGrades from "./pages/MyGrades";
 import ChildrenSchedule from "./pages/ChildrenSchedule";
@@ -64,6 +65,7 @@ function App() {
           <Route path="/quan-ly-ky-thi" element={<Grade />} />
           <Route path="/quan-ly-diem-danh" element={<Attendance />} />
           <Route path="/quan-ly-ghi-danh" element={<Enrollment />} />
+          <Route path="/quan-ly-dang-ky" element={<RegistrationManagement />} />
 
           {/* Student Specific Routes */}
           <Route path="/my-schedule" element={<MySchedule />} />

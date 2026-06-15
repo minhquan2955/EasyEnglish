@@ -123,8 +123,22 @@ export const getClasses = async (req, res, next) => {
         .sort({ createdAt: -1 }),
       Class.countDocuments(filter),
     ]);
+    const Enrollment = (await import("../models/Enrollment.js")).default;
+    const classesWithCount = await Promise.all(
+      classes.map(async (cls) => {
+        const studentCount = await Enrollment.countDocuments({
+          classId: cls._id,
+          status: "active",
+        });
+        return {
+          ...cls.toObject(),
+          studentCount,
+        };
+      })
+    );
+
     res.status(200).json({
-      classes,
+      classes: classesWithCount,
       pagination: {
         page: Number(page),
         limit: Number(limit),
@@ -160,7 +174,17 @@ export const getClassById = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy lớp học");
     }
-    res.status(200).json({ class: classDoc });
+    const Enrollment = (await import("../models/Enrollment.js")).default;
+    const studentCount = await Enrollment.countDocuments({
+      classId: classDoc._id,
+      status: "active",
+    });
+    res.status(200).json({
+      class: {
+        ...classDoc.toObject(),
+        studentCount,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -232,9 +256,17 @@ export const updateClass = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy lớp học");
     }
+    const Enrollment = (await import("../models/Enrollment.js")).default;
+    const studentCount = await Enrollment.countDocuments({
+      classId: updatedClass._id,
+      status: "active",
+    });
     res.status(200).json({
       message: "Cập nhật lớp học thành công",
-      class: updatedClass,
+      class: {
+        ...updatedClass.toObject(),
+        studentCount,
+      },
     });
   } catch (error) {
     next(error);
