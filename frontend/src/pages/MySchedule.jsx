@@ -43,7 +43,7 @@ export default function MySchedule() {
           const endDate = new Date(`${session.date.split('T')[0]}T${session.endTime}`);
           return {
             id: session._id,
-            title: `Lớp ${session.classId?.classCode} - P.${session.classId?.room}`,
+            title: `Buổi ${session.sessionNumber || '?'} | ${session.classId?.classCode || ''}${session.classId?.room ? ' | ' + session.classId.room : ''}${session.topic ? ' - ' + session.topic : ''}`,
             start: startDate,
             end: endDate,
             resource: session,
@@ -104,8 +104,14 @@ export default function MySchedule() {
         backgroundColor,
         color,
         border: 'none',
-        borderRadius: '6px',
-        opacity: 0.9,
+        borderRadius: '5px',
+        padding: '2px 5px',
+        fontSize: '11px',
+        fontWeight: 600,
+        fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+        lineHeight: '1.3',
+        letterSpacing: '-0.01em',
+        cursor: 'default',
       }
     };
   };
@@ -184,6 +190,24 @@ export default function MySchedule() {
               .schedule-calendar-light .rbc-event {
                 box-shadow: 0 1px 3px rgba(0,0,0,0.12);
                 border: none;
+                transition: box-shadow 0.1s;
+                font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+              }
+              .schedule-calendar-light .rbc-event:hover {
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+              }
+              .schedule-calendar-light .rbc-event-label {
+                font-size: 9px;
+                opacity: 0.85;
+                font-weight: 500;
+                letter-spacing: 0.02em;
+              }
+              .schedule-calendar-light .rbc-event-content {
+                font-size: 11px;
+                font-weight: 600;
+                line-height: 1.35;
+                word-break: break-word;
+                overflow-wrap: break-word;
               }
               .schedule-calendar-light .rbc-toolbar button {
                 color: #374151;

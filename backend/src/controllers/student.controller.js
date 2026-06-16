@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import Student from "../models/Student.js";
+import Enrollment from "../models/Enrollment.js";
 
 /**
  * @desc    Admin tạo học sinh mới (tạo cả User và Student profile)
@@ -84,8 +85,36 @@ export const getStudents = async (req, res, next) => {
       Student.countDocuments(),
     ]);
 
+    // Fetch active enrollments for all students in the current page
+    const studentIds = students.map((s) => s._id);
+    const enrollments = await Enrollment.find({
+      studentId: { $in: studentIds },
+      status: "active",
+    })
+      .populate({
+        path: "classId",
+        select: "classCode",
+      })
+      .select("studentId classId");
+
+    // Build a map: studentId -> [classCode, ...]
+    const enrollmentMap = {};
+    enrollments.forEach((e) => {
+      const sid = e.studentId.toString();
+      if (!enrollmentMap[sid]) enrollmentMap[sid] = [];
+      if (e.classId?.classCode) {
+        enrollmentMap[sid].push(e.classId.classCode);
+      }
+    });
+
+    // Attach enrolled classes to each student
+    const studentsWithClasses = students.map((s) => ({
+      ...s.toObject(),
+      enrolledClasses: enrollmentMap[s._id.toString()] || [],
+    }));
+
     res.status(200).json({
-      students,
+      students: studentsWithClasses,
       pagination: {
         page: Number(page),
         limit: Number(limit),

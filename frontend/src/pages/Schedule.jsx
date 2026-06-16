@@ -80,7 +80,7 @@ export default function Schedule() {
           const dateStr = new Date(s.date).toISOString().split('T')[0];
           return {
             id: s._id,
-            title: s.topic || `Buổi ${s.sessionNumber}`,
+            title: `Buổi ${s.sessionNumber}${s.classId?.classCode ? ' | ' + s.classId.classCode : ''}${s.room ? ' | ' + s.room : ''}${s.topic ? ' - ' + s.topic : ''}`,
             start: new Date(`${dateStr}T${s.startTime}:00`),
             end: new Date(`${dateStr}T${s.endTime}:00`),
             resource: s,
@@ -164,6 +164,7 @@ export default function Schedule() {
   };
 
   // Custom event style for calendar
+  const isAdmin = user?.role === 'admin';
   const eventStyleGetter = (event) => {
     const status = event.resource?.status || 'scheduled';
     const color = STATUS_COLORS[status] || STATUS_COLORS.scheduled;
@@ -171,11 +172,15 @@ export default function Schedule() {
       style: {
         backgroundColor: color.bg,
         color: color.text,
-        borderRadius: '6px',
+        borderRadius: '5px',
         border: 'none',
-        padding: '2px 6px',
-        fontSize: '12px',
-        fontWeight: 500,
+        padding: '2px 5px',
+        fontSize: '11px',
+        fontWeight: 600,
+        fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+        lineHeight: '1.3',
+        letterSpacing: '-0.01em',
+        cursor: isAdmin ? 'pointer' : 'default',
       },
     };
   };
@@ -392,7 +397,8 @@ export default function Schedule() {
                   min={new Date(2025, 0, 1, 6, 0)}
                   max={new Date(2025, 0, 1, 22, 0)}
                   eventPropGetter={eventStyleGetter}
-                  onSelectEvent={handleEventClick}
+                  onSelectEvent={isAdmin ? handleEventClick : undefined}
+                  selectable={isAdmin}
                   messages={messages}
                   culture="vi"
                   style={{ height: '100%' }}
@@ -580,20 +586,26 @@ export default function Schedule() {
         }
         .schedule-calendar-light .rbc-event {
           box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-          cursor: pointer;
           transition: transform 0.1s, box-shadow 0.1s;
+          font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .schedule-calendar-light .rbc-event:hover {
-          transform: translateY(-1px);
           box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         .schedule-calendar-light .rbc-event-label {
-          font-size: 10px;
-          opacity: 0.9;
+          font-size: 9px;
+          opacity: 0.85;
+          font-weight: 500;
+          letter-spacing: 0.02em;
         }
         .schedule-calendar-light .rbc-event-content {
-          font-size: 12px;
-          font-weight: 500;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 1.35;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
         .schedule-calendar-light .rbc-show-more {
           color: #0070d1;

@@ -427,6 +427,10 @@ export const getSchedulesByClass = async (req, res, next) => {
 
     const schedules = await Schedule.find({ classId })
       .populate({
+        path: "classId",
+        select: "classCode room",
+      })
+      .populate({
         path: "teacherId",
         select: "employeeCode",
         populate: { path: "userId", select: "fullName" },

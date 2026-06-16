@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserSquare, Plus, IdentificationBadge, EnvelopeSimple, Phone, LockKey, CalendarBlank, GenderIntersex, Heartbeat, PencilSimple, Tag } from '@phosphor-icons/react';
+import { UserSquare, Plus, IdentificationBadge, EnvelopeSimple, Phone, LockKey, CalendarBlank, GenderIntersex, Heartbeat, PencilSimple, Tag, Chalkboard } from '@phosphor-icons/react';
 
 export default function Student() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'create'
@@ -29,7 +29,7 @@ export default function Student() {
     setLoadingList(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/admin/students', {
+      const res = await fetch('/api/admin/students?limit=200', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -209,6 +209,7 @@ export default function Student() {
                     <th className="pb-3 font-medium">Họ và tên</th>
                     <th className="pb-3 font-medium">Email</th>
                     <th className="pb-3 font-medium">Giới tính</th>
+                    <th className="pb-3 font-medium">Lớp đang học</th>
                     <th className="pb-3 font-medium">Trạng thái</th>
                     <th className="pb-3 font-medium text-right">Hành động</th>
                   </tr>
@@ -216,7 +217,7 @@ export default function Student() {
                 <tbody>
                   {students.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="py-8 text-center text-gray-500">
+                      <td colSpan="7" className="py-8 text-center text-gray-500">
                         Chưa có học sinh nào.
                       </td>
                     </tr>
@@ -227,6 +228,23 @@ export default function Student() {
                         <td className="py-4 text-gray-300">{st.userId?.fullName || '-'}</td>
                         <td className="py-4 text-gray-400">{st.userId?.email || '-'}</td>
                         <td className="py-4 text-gray-400">{st.gender === 'male' ? 'Nam' : 'Nữ'}</td>
+                        <td className="py-4">
+                          {st.enrolledClasses && st.enrolledClasses.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {st.enrolledClasses.map((code) => (
+                                <span
+                                  key={code}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-xs font-medium bg-ps-blue/10 text-ps-blue border border-ps-blue/20"
+                                >
+                                  <Chalkboard size={12} />
+                                  {code}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-gray-600 text-xs italic">Chưa có lớp</span>
+                          )}
+                        </td>
                         <td className="py-4">
                           <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
                             st.userId?.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 'bg-[#c81b3a]/10 text-[#c81b3a]'
