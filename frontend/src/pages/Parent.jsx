@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { UsersThree, Plus, IdentificationBadge, EnvelopeSimple, Phone, LockKey, PencilSimple, Tag, Users } from '@phosphor-icons/react';
+import api from '../api';
 
 export default function Parent() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'create'
@@ -25,14 +26,8 @@ export default function Parent() {
   const fetchParents = async () => {
     setLoadingList(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/admin/parents', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setParents(data.parents || []);
-      }
+      const { data } = await api.get('/admin/parents');
+      setParents(data.parents || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -42,14 +37,8 @@ export default function Parent() {
 
   const fetchStudents = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/admin/students?limit=100', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setAllStudents(data.students || []);
-      }
+      const { data } = await api.get('/admin/students?limit=100');
+      setAllStudents(data.students || []);
     } catch (err) {
       console.error(err);
     }
@@ -112,8 +101,6 @@ export default function Parent() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
       const payload = {
         fullName: formData.fullName,
         email: formData.email,
@@ -129,23 +116,10 @@ export default function Parent() {
         payload.status = formData.status;
       }
 
-      const endpoint = editingId ? `/api/admin/parents/${editingId}` : '/api/admin/parents';
-      const method = editingId ? 'PUT' : 'POST';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || (editingId ? 'Lỗi khi cập nhật phụ huynh' : 'Lỗi khi tạo phụ huynh'));
-      }
+      const endpoint = editingId ? `/admin/parents/${editingId}` : '/admin/parents';
+      editingId
+        ? await api.put(endpoint, payload)
+        : await api.post(endpoint, payload);
 
       setSuccess(editingId ? `Cập nhật phụ huynh thành công!` : `Tạo phụ huynh thành công!`);
       
@@ -154,7 +128,7 @@ export default function Parent() {
         setSuccess(`Tạo phụ huynh thành công!`); // Restore success message after reset
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

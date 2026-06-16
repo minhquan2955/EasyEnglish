@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Chalkboard, Users, UserPlus, ArrowLeft, WarningCircle, CheckCircle, Trash } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function Enrollment() {
   const { user } = useAuth();
@@ -37,17 +38,11 @@ export default function Enrollment() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/classes', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setClasses(data.classes || data || []);
-      }
+      const { data } = await api.get('/classes');
+      setClasses(data.classes || data || []);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải danh sách lớp');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải danh sách lớp');
     } finally {
       setLoading(false);
     }
@@ -67,33 +62,20 @@ export default function Enrollment() {
     setSelectedClass(cls);
     
     try {
-      const token = localStorage.getItem('token');
-      
       // Fetch enrolled students
-      const resEnrolled = await fetch(`/api/enrollments/class/${cls._id}/students`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (resEnrolled.ok) {
-        const data = await resEnrolled.json();
-        setEnrolledStudents(data.students || []);
-      }
+      const { data: enrolledData } = await api.get(`/enrollments/class/${cls._id}/students`);
+      setEnrolledStudents(enrolledData.students || []);
 
       // Fetch all students (for the dropdown)
       if (allStudents.length === 0) {
-        const resAll = await fetch('/api/admin/students?limit=2000', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (resAll.ok) {
-          const dataAll = await resAll.json();
-          setAllStudents(dataAll.students || []);
-        }
+        const { data: allData } = await api.get('/admin/students?limit=2000');
+        setAllStudents(allData.students || []);
       }
       
       setCurrentLevel(2);
     } catch (err) {
       console.error(err);
-      setError('Lỗi khi tải danh sách học sinh');
+      setError(err.response?.data?.message || 'Lỗi khi tải danh sách học sinh');
     } finally {
       setLoading(false);
     }
@@ -131,34 +113,20 @@ export default function Enrollment() {
     setError('');
     
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/enrollments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          studentId: enrollForm.studentId,
-          classId: selectedClass._id,
-          enrollDate: enrollForm.enrollDate,
-          notes: enrollForm.notes
-        })
+      await api.post('/enrollments', {
+        studentId: enrollForm.studentId,
+        classId: selectedClass._id,
+        enrollDate: enrollForm.enrollDate,
+        notes: enrollForm.notes
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setSuccess('Ghi danh học sinh thành công!');
-        setModalOpen(false);
-        // Tải lại danh sách học sinh trong lớp
-        fetchClassDetails(selectedClass);
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        setError(data.message || 'Lỗi khi ghi danh học sinh');
-      }
+      setSuccess('Ghi danh học sinh thành công!');
+      setModalOpen(false);
+      fetchClassDetails(selectedClass);
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi ghi danh');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi ghi danh');
     } finally {
       setSubmitting(false);
     }
@@ -177,23 +145,13 @@ export default function Enrollment() {
     setEnrollmentToDelete(null);
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/enrollments/${enrollmentId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res.ok) {
-        setSuccess('Đã xóa học sinh khỏi lớp');
-        fetchClassDetails(selectedClass);
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        const data = await res.json();
-        setError(data.message || 'Lỗi khi xóa học sinh');
-      }
+      await api.delete(`/enrollments/${enrollmentId}`);
+      setSuccess('Đã xóa học sinh khỏi lớp');
+      fetchClassDetails(selectedClass);
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi xóa học sinh');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi xóa học sinh');
     }
   };
 

@@ -9,6 +9,7 @@ import {
   XCircle,
 } from "@phosphor-icons/react";
 import { useAuth } from "../context/AuthContext";
+import api from "../api";
 
 export default function Attendance() {
   const { user } = useAuth();
@@ -31,19 +32,10 @@ export default function Attendance() {
     const fetchClasses = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api/classes?limit=200", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // Admin response has data.classes, Teacher response might be direct array or data.classes
-          setClasses(data.classes || data || []);
-        } else {
-          setError("Không thể tải danh sách lớp học");
-        }
+        const { data } = await api.get("/classes?limit=200");
+        setClasses(data.classes || data || []);
       } catch (err) {
-        setError("Lỗi kết nối khi tải lớp học");
+        setError(err.response?.data?.message || "Lỗi kết nối khi tải lớp học");
       } finally {
         setLoading(false);
       }
@@ -61,39 +53,23 @@ export default function Attendance() {
       setEnrollments([]);
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-
         // Fetch schedules
-        const resSchedule = await fetch(
-          `/api/schedules/class/${selectedClass._id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+        const { data: scheduleData } = await api.get(
+          `/schedules/class/${selectedClass._id}`
         );
 
-        // Fetch enrollments (note: route ends with /students)
-        const resEnroll = await fetch(
-          `/api/enrollments/class/${selectedClass._id}/students`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+        // Fetch enrollments
+        const { data: enrollData } = await api.get(
+          `/enrollments/class/${selectedClass._id}/students`
         );
 
-        if (resSchedule.ok) {
-          const scheduleData = await resSchedule.json();
-          // Sort schedules by date desc
-          const sortedSchedules = (scheduleData.schedules || []).sort(
-            (a, b) => new Date(b.date) - new Date(a.date),
-          );
-          setSchedules(sortedSchedules);
-        }
-
-        if (resEnroll.ok) {
-          const enrollData = await resEnroll.json();
-          setEnrollments(enrollData.students || []);
-        }
+        const sortedSchedules = (scheduleData.schedules || []).sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+        setSchedules(sortedSchedules);
+        setEnrollments(enrollData.students || []);
       } catch (err) {
-        setError("Lỗi khi tải dữ liệu lớp học");
+        setError(err.response?.data?.message || "Lỗi khi tải dữ liệu lớp học");
       } finally {
         setLoading(false);
       }
@@ -109,40 +85,32 @@ export default function Attendance() {
     const fetchAttendance = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          `/api/attendances/schedule/${selectedSchedule._id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+        const { data } = await api.get(
+          `/attendances/schedule/${selectedSchedule._id}`
         );
 
-        if (res.ok) {
-          const data = await res.json();
-          const existingAttendances = data.attendances || [];
-          setAttendanceData(existingAttendances);
+        const existingAttendances = data.attendances || [];
+        setAttendanceData(existingAttendances);
 
-          // Build initial records map based on enrollments and existing attendances
-          const initialRecords = {};
-          enrollments.forEach((enroll) => {
-            const studentId = enroll.studentId._id;
-            const existing = existingAttendances.find(
-              (a) => a.studentId._id === studentId,
-            );
+        const initialRecords = {};
+        enrollments.forEach((enroll) => {
+          const studentId = enroll.studentId._id;
+          const existing = existingAttendances.find(
+            (a) => a.studentId._id === studentId
+          );
 
-            if (existing) {
-              initialRecords[studentId] = {
-                status: existing.status,
-                notes: existing.notes || "",
-              };
-            } else {
-              initialRecords[studentId] = { status: "present", notes: "" }; // default
-            }
-          });
-          setAttendanceRecords(initialRecords);
-        }
+          if (existing) {
+            initialRecords[studentId] = {
+              status: existing.status,
+              notes: existing.notes || "",
+            };
+          } else {
+            initialRecords[studentId] = { status: "present", notes: "" };
+          }
+        });
+        setAttendanceRecords(initialRecords);
       } catch (err) {
-        setError("Lỗi khi tải danh sách điểm danh");
+        setError(err.response?.data?.message || "Lỗi khi tải danh sách điểm danh");
       } finally {
         setLoading(false);
       }
@@ -172,37 +140,23 @@ export default function Attendance() {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("token");
-
       const studentsToSave = Object.keys(attendanceRecords).map(
         (studentId) => ({
           studentId,
           status: attendanceRecords[studentId].status,
           notes: attendanceRecords[studentId].notes,
-        }),
+        })
       );
 
-      const res = await fetch("/api/attendances/bulk", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          scheduleId: selectedSchedule._id,
-          students: studentsToSave,
-        }),
+      const { data } = await api.post("/attendances/bulk", {
+        scheduleId: selectedSchedule._id,
+        students: studentsToSave,
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setSuccess(data.message || "Lưu điểm danh thành công!");
-        setTimeout(() => setSuccess(""), 3000);
-      } else {
-        setError(data.message || "Lỗi khi lưu điểm danh");
-      }
+      setSuccess(data.message || "Lưu điểm danh thành công!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Lỗi kết nối");
+      setError(err.response?.data?.message || "Lỗi kết nối");
     } finally {
       setSaving(false);
     }

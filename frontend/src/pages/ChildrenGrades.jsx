@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ClipboardText, WarningCircle, GraduationCap, UserCircle } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function ChildrenGrades() {
   const { user } = useAuth();
@@ -23,20 +24,11 @@ export default function ChildrenGrades() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/grades/my-children', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setChildrenData(data.children || []);
-      } else {
-        const errData = await res.json();
-        setError(errData.message || 'Lỗi khi tải bảng điểm');
-      }
+      const { data } = await api.get('/grades/my-children');
+      setChildrenData(data.children || []);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải bảng điểm');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải bảng điểm');
     } finally {
       setLoading(false);
     }

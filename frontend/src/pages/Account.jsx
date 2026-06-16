@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { UserPlus, IdentificationCard, EnvelopeSimple, Phone, Lock, Tag, Users, MagnifyingGlass, PencilSimple } from '@phosphor-icons/react';
+import api from '../api';
 
 export default function Account() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'create'
@@ -25,16 +26,11 @@ export default function Account() {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users || []);
-      }
+      const { data } = await api.get('/admin/users');
+      setUsers(data.users || []);
     } catch (err) {
       console.error(err);
+      setError(err.response?.data?.message || 'Lỗi khi tải danh sách người dùng');
     } finally {
       setLoadingUsers(false);
     }
@@ -75,29 +71,10 @@ export default function Account() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
-      const endpoint = `/api/admin/users/${editingId}`;
-      const method = 'PUT';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Đã có lỗi xảy ra khi cập nhật tài khoản');
-      }
-
+      await api.put(`/admin/users/${editingId}`, formData);
       setSuccess(`Cập nhật thành công!`);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || 'Đã có lỗi xảy ra khi cập nhật tài khoản');
     } finally {
       setLoading(false);
     }

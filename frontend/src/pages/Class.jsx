@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Chalkboard, Plus, Users, Hash, Door, CalendarBlank, Clock, UserSquare, PencilSimple, Tag } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function Class() {
   const { user } = useAuth();
@@ -34,14 +35,8 @@ export default function Class() {
   const fetchClasses = async () => {
     setLoadingList(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/classes?limit=200', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setClasses(data.classes || data || []);
-      }
+      const { data } = await api.get('/classes?limit=200');
+      setClasses(data.classes || data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -52,30 +47,18 @@ export default function Class() {
   const fetchDependencies = async () => {
     setLoadingDeps(true);
     try {
-      const token = localStorage.getItem('token');
-      
       // Fetch courses
-      const resCourses = await fetch('/api/courses', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (resCourses.ok) {
-        const data = await resCourses.json();
-        setCourses(data.courses || data || []);
-      }
+      const { data: courseData } = await api.get('/courses');
+      setCourses(courseData.courses || courseData || []);
 
       // Fetch teachers (from teacher profiles)
-      const resTeachers = await fetch('/api/admin/teachers?limit=100', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (resTeachers.ok) {
-        const data = await resTeachers.json();
-        const teacherList = data.teachers || [];
-        // Map to include fullName from populated userId
-        setTeachers(teacherList.map(t => ({
-          _id: t._id,
-          fullName: t.userId?.fullName || 'Unknown'
-        })));
-      }
+      const { data: teacherData } = await api.get('/admin/teachers?limit=100');
+      const teacherList = teacherData.teachers || [];
+      // Map to include fullName from populated userId
+      setTeachers(teacherList.map(t => ({
+        _id: t._id,
+        fullName: t.userId?.fullName || 'Unknown'
+      })));
     } catch (err) {
       console.error(err);
     } finally {
@@ -160,8 +143,6 @@ export default function Class() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
       const payload = {
         classCode: formData.classCode,
         courseId: formData.courseId,
@@ -178,23 +159,10 @@ export default function Class() {
         }
       };
 
-      const endpoint = editingId ? `/api/classes/${editingId}` : '/api/classes';
-      const method = editingId ? 'PUT' : 'POST';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || (editingId ? 'Đã có lỗi xảy ra khi cập nhật lớp học' : 'Đã có lỗi xảy ra khi tạo lớp học'));
-      }
+      const endpoint = editingId ? `/classes/${editingId}` : '/classes';
+      const { data } = editingId
+        ? await api.put(endpoint, payload)
+        : await api.post(endpoint, payload);
 
       setSuccess(editingId ? `Cập nhật lớp học ${data.classCode || formData.classCode} thành công!` : `Tạo lớp học ${data.classCode || formData.classCode} thành công!`);
       
@@ -214,7 +182,7 @@ export default function Class() {
         });
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

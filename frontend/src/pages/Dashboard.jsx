@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useAuth } from "../context/AuthContext";
+import api from "../api";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -33,25 +34,13 @@ const Dashboard = () => {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `/api/admin/dashboard-stats?period=${period}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const { data } = await api.get(
+          `/admin/dashboard-stats?period=${period}`
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard stats");
-        }
-
-        const data = await response.json();
         setStats(data);
         setError(null);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.message || "Failed to fetch dashboard stats");
       } finally {
         setLoading(false);
       }

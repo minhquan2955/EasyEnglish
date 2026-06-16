@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckSquareOffset, WarningCircle, CheckCircle, XCircle } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function MyAttendance() {
   const { user } = useAuth();
@@ -13,24 +14,14 @@ export default function MyAttendance() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/attendances/my-attendance', {
-        headers: { Authorization: `Bearer ${token}` }
+      const { data } = await api.get('/attendances/my-attendance');
+      const sorted = (data.attendances || []).sort((a, b) => {
+        return new Date(b.scheduleId?.date) - new Date(a.scheduleId?.date);
       });
-      if (res.ok) {
-        const data = await res.json();
-        // Sort by date descending
-        const sorted = (data.attendances || []).sort((a, b) => {
-          return new Date(b.scheduleId?.date) - new Date(a.scheduleId?.date);
-        });
-        setAttendances(sorted);
-      } else {
-        const errData = await res.json();
-        setError(errData.message || 'Lỗi khi tải dữ liệu điểm danh');
-      }
+      setAttendances(sorted);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải điểm danh');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải điểm danh');
     } finally {
       setLoading(false);
     }

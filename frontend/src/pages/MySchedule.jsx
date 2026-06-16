@@ -8,6 +8,7 @@ import vi from 'date-fns/locale/vi';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar as CalendarIcon, WarningCircle } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 const locales = {
   'vi': vi,
@@ -32,47 +33,35 @@ export default function MySchedule() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/schedules/my-schedule', {
-        headers: { Authorization: `Bearer ${token}` }
+      const { data } = await api.get('/schedules/my-schedule');
+      const formattedEvents = data.schedules.map(session => {
+        const startDate = new Date(`${session.date.split('T')[0]}T${session.startTime}`);
+        const endDate = new Date(`${session.date.split('T')[0]}T${session.endTime}`);
+        return {
+          id: session._id,
+          title: `Buổi ${session.sessionNumber || '?'} | ${session.classId?.classCode || ''}${session.classId?.room ? ' | ' + session.classId.room : ''}${session.topic ? ' - ' + session.topic : ''}`,
+          start: startDate,
+          end: endDate,
+          resource: session,
+          type: session.status
+        };
       });
-      if (res.ok) {
-        const data = await res.json();
-        const formattedEvents = data.schedules.map(session => {
-          const startDate = new Date(`${session.date.split('T')[0]}T${session.startTime}`);
-          const endDate = new Date(`${session.date.split('T')[0]}T${session.endTime}`);
-          return {
-            id: session._id,
-            title: `Buổi ${session.sessionNumber || '?'} | ${session.classId?.classCode || ''}${session.classId?.room ? ' | ' + session.classId.room : ''}${session.topic ? ' - ' + session.topic : ''}`,
-            start: startDate,
-            end: endDate,
-            resource: session,
-            type: session.status // 'scheduled' | 'makeup' | 'cancelled' | 'completed'
-          };
-        });
-        setEvents(formattedEvents);
+      setEvents(formattedEvents);
 
-        // Auto jump to the first future/current event date if any
-        if (formattedEvents.length > 0) {
-            const now = new Date();
-            const futureEvents = formattedEvents.filter(e => e.start >= now);
-            if (futureEvents.length > 0) {
-                const earliest = futureEvents.reduce((a, b) => a.start < b.start ? a : b);
-                setCurrentDate(earliest.start);
-            } else {
-                // If all in past, jump to the latest one
-                const latest = formattedEvents.reduce((a, b) => a.start > b.start ? a : b);
-                setCurrentDate(latest.start);
-            }
-        }
-
-      } else {
-        const errData = await res.json();
-        setError(errData.message || 'Lỗi khi tải lịch học');
+      if (formattedEvents.length > 0) {
+          const now = new Date();
+          const futureEvents = formattedEvents.filter(e => e.start >= now);
+          if (futureEvents.length > 0) {
+              const earliest = futureEvents.reduce((a, b) => a.start < b.start ? a : b);
+              setCurrentDate(earliest.start);
+          } else {
+              const latest = formattedEvents.reduce((a, b) => a.start > b.start ? a : b);
+              setCurrentDate(latest.start);
+          }
       }
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải lịch học');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải lịch học');
     } finally {
       setLoading(false);
     }

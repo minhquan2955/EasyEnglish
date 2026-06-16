@@ -8,6 +8,7 @@ import {
   CircleNotch,
 } from "@phosphor-icons/react";
 import { useAuth } from "../context/AuthContext";
+import api from "../api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -51,17 +52,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Đăng nhập thất bại");
-      }
+      const { data } = await api.post("/auth/login", { email, password });
 
       // Save auth data
       localStorage.setItem("token", data.token);
@@ -82,7 +73,7 @@ export default function Login() {
       // Redirect to profile page after successful login
       navigate("/profile");
     } catch (err) {
-      setError(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+      setError(err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setLoading(false);
     }

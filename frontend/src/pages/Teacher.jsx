@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChalkboardTeacher, Plus, IdentificationBadge, EnvelopeSimple, Phone, LockKey, PencilSimple, Tag, Money, Clock } from '@phosphor-icons/react';
+import api from '../api';
 
 export default function Teacher() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'create'
@@ -27,14 +28,8 @@ export default function Teacher() {
   const fetchTeachers = async () => {
     setLoadingList(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/admin/teachers', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setTeachers(data.teachers || []);
-      }
+      const { data } = await api.get('/admin/teachers');
+      setTeachers(data.teachers || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -96,8 +91,6 @@ export default function Teacher() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
       const payload = {
         fullName: formData.fullName,
         email: formData.email,
@@ -118,23 +111,10 @@ export default function Teacher() {
         payload.status = formData.status;
       }
 
-      const endpoint = editingId ? `/api/admin/teachers/${editingId}` : '/api/admin/teachers';
-      const method = editingId ? 'PUT' : 'POST';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || (editingId ? 'Lỗi khi cập nhật giáo viên' : 'Lỗi khi tạo giáo viên'));
-      }
+      const endpoint = editingId ? `/admin/teachers/${editingId}` : '/admin/teachers';
+      editingId
+        ? await api.put(endpoint, payload)
+        : await api.post(endpoint, payload);
 
       setSuccess(editingId ? `Cập nhật giáo viên thành công!` : `Tạo giáo viên thành công!`);
       
@@ -143,7 +123,7 @@ export default function Teacher() {
         setSuccess(`Tạo giáo viên thành công!`); // Restore success message after reset
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

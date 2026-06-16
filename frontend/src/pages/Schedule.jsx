@@ -4,6 +4,7 @@ import { format, parse, startOfWeek, getDay } from 'date-fns';
 import vi from 'date-fns/locale/vi';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { CalendarBlank, Plus, ListBullets, PencilSimple, X, Lightning, Clock, MapPin, BookOpen, Tag } from '@phosphor-icons/react';
+import api from '../api';
 
 const locales = { vi };
 const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
@@ -42,17 +43,12 @@ export default function Schedule() {
   const [generating, setGenerating] = useState(false);
   const [genMsg, setGenMsg] = useState('');
 
-  const token = localStorage.getItem('token');
-
   // Fetch summary list
   const fetchSummaries = async () => {
     setLoadingList(true);
     try {
-      const res = await fetch('/api/admin/schedules', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setSummaries(data.schedules || []);
-      }
+      const { data } = await api.get('/admin/schedules');
+      setSummaries(data.schedules || []);
     } catch (err) { console.error(err); }
     finally { setLoadingList(false); }
   };
@@ -60,11 +56,8 @@ export default function Schedule() {
   // Fetch classes for dropdown
   const fetchClasses = async () => {
     try {
-      const res = await fetch('/api/classes?limit=200', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setClasses(data.classes || data || []);
-      }
+      const { data } = await api.get('/classes?limit=200');
+      setClasses(data.classes || data || []);
     } catch (err) { console.error(err); }
   };
 
@@ -73,30 +66,26 @@ export default function Schedule() {
     if (!classId) { setEvents([]); return; }
     setLoadingCal(true);
     try {
-      const res = await fetch(`/api/schedules/class/${classId}`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) {
-        const data = await res.json();
-        const mapped = (data.schedules || []).map(s => {
-          const dateStr = new Date(s.date).toISOString().split('T')[0];
-          return {
-            id: s._id,
-            title: `Buổi ${s.sessionNumber}${s.classId?.classCode ? ' | ' + s.classId.classCode : ''}${s.room ? ' | ' + s.room : ''}${s.topic ? ' - ' + s.topic : ''}`,
-            start: new Date(`${dateStr}T${s.startTime}:00`),
-            end: new Date(`${dateStr}T${s.endTime}:00`),
-            resource: s,
-          };
-        });
-        setEvents(mapped);
-        if (mapped.length > 0) {
-          // Auto-jump to the first session date
-          setCurrentDate(mapped[0].start);
-        } else {
-          setCurrentDate(new Date());
-        }
+      const { data } = await api.get(`/schedules/class/${classId}`);
+      const mapped = (data.schedules || []).map(s => {
+        const dateStr = new Date(s.date).toISOString().split('T')[0];
+        return {
+          id: s._id,
+          title: `Buổi ${s.sessionNumber}${s.classId?.classCode ? ' | ' + s.classId.classCode : ''}${s.room ? ' | ' + s.room : ''}${s.topic ? ' - ' + s.topic : ''}`,
+          start: new Date(`${dateStr}T${s.startTime}:00`),
+          end: new Date(`${dateStr}T${s.endTime}:00`),
+          resource: s,
+        };
+      });
+      setEvents(mapped);
+      if (mapped.length > 0) {
+        setCurrentDate(mapped[0].start);
+      } else {
+        setCurrentDate(new Date());
       }
     } catch (err) { console.error(err); }
     finally { setLoadingCal(false); }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchClasses(); // Always load classes for both tabs
@@ -112,17 +101,11 @@ export default function Schedule() {
     setGenerating(true);
     setGenMsg('');
     try {
-      const res = await fetch('/api/admin/schedules/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ classId }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Lỗi khi tạo lịch');
+      const { data } = await api.post('/admin/schedules/generate', { classId });
       setGenMsg(data.message);
-      fetchSummaries(); // Refresh list
+      fetchSummaries();
     } catch (err) {
-      setGenMsg(`❌ ${err.message}`);
+      setGenMsg(`❌ ${err.response?.data?.message || err.message}`);
     } finally {
       setGenerating(false);
     }
@@ -149,17 +132,11 @@ export default function Schedule() {
     setEditError('');
     setEditSuccess('');
     try {
-      const url = user?.role === 'admin' ? `/api/admin/schedules/${editingSession._id}` : `/api/schedules/${editingSession._id}`;
-      const res = await fetch(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(editForm),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Lỗi cập nhật');
+      const url = user?.role === 'admin' ? `/admin/schedules/${editingSession._id}` : `/schedules/${editingSession._id}`;
+      await api.put(url, editForm);
       setEditSuccess('Cập nhật thành công!');
       fetchClassSchedules(selectedClassId);
-    } catch (err) { setEditError(err.message); }
+    } catch (err) { setEditError(err.response?.data?.message || err.message); }
     finally { setEditLoading(false); }
   };
 

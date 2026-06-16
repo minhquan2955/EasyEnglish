@@ -11,6 +11,7 @@ import {
   Note
 } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function RegistrationManagement() {
   const { user } = useAuth();
@@ -29,20 +30,11 @@ export default function RegistrationManagement() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/registrations', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setRegistrations(data || []);
-      } else {
-        const data = await res.json();
-        setError(data.message || 'Lỗi khi tải danh sách đăng ký');
-      }
+      const { data } = await api.get('/registrations');
+      setRegistrations(data || []);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải danh sách đăng ký');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải danh sách đăng ký');
     } finally {
       setLoading(false);
     }
@@ -59,29 +51,15 @@ export default function RegistrationManagement() {
     setUpdatingId(id);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/registrations/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      if (res.ok) {
-        setSuccess('Cập nhật trạng thái thành công!');
-        setRegistrations(prev => 
-          prev.map(reg => reg._id === id ? { ...reg, status: newStatus } : reg)
-        );
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        const data = await res.json();
-        setError(data.message || 'Lỗi khi cập nhật trạng thái');
-      }
+      await api.put(`/registrations/${id}`, { status: newStatus });
+      setSuccess('Cập nhật trạng thái thành công!');
+      setRegistrations(prev => 
+        prev.map(reg => reg._id === id ? { ...reg, status: newStatus } : reg)
+      );
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi cập nhật trạng thái');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi cập nhật trạng thái');
     } finally {
       setUpdatingId(null);
     }

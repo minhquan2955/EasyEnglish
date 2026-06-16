@@ -8,6 +8,7 @@ import vi from 'date-fns/locale/vi';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar as CalendarIcon, WarningCircle, UserCircle } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 const locales = {
   'vi': vi,
@@ -33,20 +34,11 @@ export default function ChildrenSchedule() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/schedules/my-children', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setChildrenData(data.children || []);
-      } else {
-        const errData = await res.json();
-        setError(errData.message || 'Lỗi khi tải lịch học');
-      }
+      const { data } = await api.get('/schedules/my-children');
+      setChildrenData(data.children || []);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải lịch học');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải lịch học');
     } finally {
       setLoading(false);
     }

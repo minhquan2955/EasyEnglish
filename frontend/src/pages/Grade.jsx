@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ClipboardText, Plus, ArrowLeft, Chalkboard, Users, GraduationCap, CheckCircle, WarningCircle } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function Grade() {
   const { user } = useAuth();
@@ -46,17 +47,11 @@ export default function Grade() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/classes?limit=200', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setClasses(data.classes || data || []);
-      }
+      const { data } = await api.get('/classes?limit=200');
+      setClasses(data.classes || data || []);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải danh sách lớp');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải danh sách lớp');
     } finally {
       setLoading(false);
     }
@@ -75,17 +70,11 @@ export default function Grade() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/grades/class/${classId}/exams`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setExams(data.exams || []);
-      }
+      const { data } = await api.get(`/grades/class/${classId}/exams`);
+      setExams(data.exams || []);
     } catch (err) {
       console.error(err);
-      setError('Lỗi khi tải danh sách bài kiểm tra');
+      setError(err.response?.data?.message || 'Lỗi khi tải danh sách bài kiểm tra');
     } finally {
       setLoading(false);
     }
@@ -102,18 +91,10 @@ export default function Grade() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      
       // 1. Fetch Students
-      const resStudents = await fetch(`/api/enrollments/class/${selectedClass._id}/students`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      let studentList = [];
-      if (resStudents.ok) {
-        const data = await resStudents.json();
-        studentList = data.students || [];
-        setStudents(studentList);
-      }
+      const { data: studentData } = await api.get(`/enrollments/class/${selectedClass._id}/students`);
+      const studentList = studentData.students || [];
+      setStudents(studentList);
 
       // 2. Prepare Grades Map
       const initialMap = {};
@@ -126,21 +107,15 @@ export default function Grade() {
           maxScore: exam.maxScore
         });
         
-        const resGrades = await fetch(`/api/grades/class/${selectedClass._id}?title=${encodeURIComponent(exam.title)}&assessmentType=${exam.assessmentType}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const { data: gradesData } = await api.get(`/grades/class/${selectedClass._id}?title=${encodeURIComponent(exam.title)}&assessmentType=${exam.assessmentType}`);
+        const grades = gradesData.grades || [];
         
-        if (resGrades.ok) {
-          const data = await resGrades.json();
-          const gradesData = data.grades || [];
-          
-          gradesData.forEach(g => {
-            initialMap[g.studentId._id] = {
-              score: g.score,
-              feedback: g.feedback || ''
-            };
-          });
-        }
+        grades.forEach(g => {
+          initialMap[g.studentId._id] = {
+            score: g.score,
+            feedback: g.feedback || ''
+          };
+        });
       } else {
         // Create new exam -> Reset form
         setExamForm({
@@ -163,7 +138,7 @@ export default function Grade() {
       
     } catch (err) {
       console.error(err);
-      setError('Lỗi khi tải danh sách học sinh và điểm');
+      setError(err.response?.data?.message || 'Lỗi khi tải danh sách học sinh và điểm');
     } finally {
       setLoading(false);
     }
@@ -218,35 +193,22 @@ export default function Grade() {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/grades/class/${selectedClass._id}/exam`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          assessmentType: examForm.assessmentType,
-          title: examForm.title,
-          maxScore: Number(examForm.maxScore),
-          scores
-        })
+      const { data } = await api.post(`/grades/class/${selectedClass._id}/exam`, {
+        assessmentType: examForm.assessmentType,
+        title: examForm.title,
+        maxScore: Number(examForm.maxScore),
+        scores
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setSuccess('Lưu bảng điểm thành công!');
-        setTimeout(() => {
-          setSuccess('');
-          fetchExams(selectedClass._id);
-          setCurrentLevel(2);
-        }, 1500);
-      } else {
-        setError(data.message || 'Lỗi khi lưu điểm');
-      }
+      setSuccess('Lưu bảng điểm thành công!');
+      setTimeout(() => {
+        setSuccess('');
+        fetchExams(selectedClass._id);
+        setCurrentLevel(2);
+      }, 1500);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi lưu điểm');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi lưu điểm');
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Books, Plus, BookBookmark, Hash, Money, Clock, Tag, PencilSimple } from '@phosphor-icons/react';
+import api from '../api';
 
 export default function Course() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'create'
@@ -26,14 +27,8 @@ export default function Course() {
   const fetchCourses = async () => {
     setLoadingCourses(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/courses', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setCourses(data.courses || data || []);
-      }
+      const { data } = await api.get('/courses');
+      setCourses(data.courses || data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -93,8 +88,6 @@ export default function Course() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
       const payload = {
         ...formData,
         totalSessions: Number(formData.totalSessions),
@@ -107,23 +100,10 @@ export default function Course() {
         }] : []
       };
 
-      const endpoint = editingId ? `/api/courses/${editingId}` : '/api/courses';
-      const method = editingId ? 'PUT' : 'POST';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || (editingId ? 'Lỗi khi cập nhật khóa học' : 'Đã có lỗi xảy ra khi tạo khóa học'));
-      }
+      const endpoint = editingId ? `/courses/${editingId}` : '/courses';
+      const { data } = editingId
+        ? await api.put(endpoint, payload)
+        : await api.post(endpoint, payload);
 
       setSuccess(editingId ? `Cập nhật khóa học ${data.name || formData.name} thành công!` : `Tạo khóa học ${data.name || formData.name} thành công!`);
       
@@ -140,7 +120,7 @@ export default function Course() {
         });
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

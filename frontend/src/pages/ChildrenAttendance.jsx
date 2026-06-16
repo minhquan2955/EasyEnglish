@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CheckSquareOffset, WarningCircle, CheckCircle, XCircle, UserCircle } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 export default function ChildrenAttendance() {
   const { user } = useAuth();
@@ -14,29 +15,19 @@ export default function ChildrenAttendance() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/attendances/my-children', {
-        headers: { Authorization: `Bearer ${token}` }
+      const { data } = await api.get('/attendances/my-children');
+      const children = data.children || [];
+      
+      children.forEach(child => {
+        if (child.attendances) {
+          child.attendances.sort((a, b) => new Date(b.scheduleId?.date) - new Date(a.scheduleId?.date));
+        }
       });
-      if (res.ok) {
-        const data = await res.json();
-        const children = data.children || [];
-        
-        // Sort attendances by date descending for each child
-        children.forEach(child => {
-          if (child.attendances) {
-            child.attendances.sort((a, b) => new Date(b.scheduleId?.date) - new Date(a.scheduleId?.date));
-          }
-        });
-        
-        setChildrenData(children);
-      } else {
-        const errData = await res.json();
-        setError(errData.message || 'Lỗi khi tải lịch sử điểm danh');
-      }
+      
+      setChildrenData(children);
     } catch (err) {
       console.error(err);
-      setError('Lỗi kết nối khi tải điểm danh');
+      setError(err.response?.data?.message || 'Lỗi kết nối khi tải điểm danh');
     } finally {
       setLoading(false);
     }
