@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Chalkboard, Plus, Users, Hash, Door, CalendarBlank, Clock, UserSquare, PencilSimple, Tag } from '@phosphor-icons/react';
+import { Chalkboard, Plus, Users, Hash, Door, CalendarBlank, Clock, UserSquare, PencilSimple, Tag, MagnifyingGlass } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
@@ -12,6 +12,7 @@ export default function Class() {
   
   const [loadingList, setLoadingList] = useState(false);
   const [loadingDeps, setLoadingDeps] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -192,6 +193,17 @@ export default function Class() {
     0: 'CN', 1: 'T2', 2: 'T3', 3: 'T4', 4: 'T5', 5: 'T6', 6: 'T7'
   };
 
+  const filteredClasses = classes.filter((cls) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (cls.classCode || '').toLowerCase().includes(q) ||
+      (cls.courseId?.name || '').toLowerCase().includes(q) ||
+      (cls.teacherId?.userId?.fullName || '').toLowerCase().includes(q) ||
+      (cls.room || '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -238,9 +250,23 @@ export default function Class() {
 
       {activeTab === 'list' && (
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Chalkboard size={24} className="text-ps-blue" />
-            <h2 className="text-xl" style={{ fontWeight: 300 }}>Danh sách Lớp học</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
+            <div className="flex items-center gap-2">
+              <Chalkboard size={24} className="text-ps-blue" />
+              <h2 className="text-xl" style={{ fontWeight: 300 }}>Danh sách Lớp học</h2>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                <MagnifyingGlass size={16} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo mã lớp, khóa học, GV, phòng..."
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[280px] placeholder:text-gray-600"
+              />
+            </div>
           </div>
 
           {loadingList ? (
@@ -263,14 +289,14 @@ export default function Class() {
                   </tr>
                 </thead>
                 <tbody>
-                  {classes.length === 0 ? (
+                  {filteredClasses.length === 0 ? (
                     <tr>
                       <td colSpan="8" className="py-8 text-center text-gray-500">
                         Không có lớp học nào.
                       </td>
                     </tr>
                   ) : (
-                    classes.map((cls) => (
+                    filteredClasses.map((cls) => (
                       <tr key={cls._id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
                         <td className="py-4 text-white font-medium">{cls.classCode}</td>
                         <td className="py-4 text-gray-300">{cls.courseId?.name || '-'}</td>

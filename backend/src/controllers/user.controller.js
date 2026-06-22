@@ -291,7 +291,7 @@ export const updateUserStatus = async (req, res, next) => {
  */
 export const updateUser = async (req, res, next) => {
   try {
-    const { fullName, phone, role, status } = req.body;
+    const { fullName, phone, role, status, password } = req.body;
 
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -303,6 +303,10 @@ export const updateUser = async (req, res, next) => {
     if (phone !== undefined) user.phone = phone; // Allow empty phone
     if (role) user.role = role;
     if (status) user.status = status;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.passwordHash = await bcrypt.hash(password, salt);
+    }
 
     await user.save();
 

@@ -10,6 +10,7 @@ import {
   Tag,
   Money,
   Clock,
+  MagnifyingGlass,
 } from "@phosphor-icons/react";
 import api from "../api";
 
@@ -17,6 +18,7 @@ export default function Teacher() {
   const [activeTab, setActiveTab] = useState("list"); // 'list' | 'create'
   const [teachers, setTeachers] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -155,6 +157,17 @@ export default function Teacher() {
     }
   };
 
+  const filteredTeachers = teachers.filter((tc) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (tc.employeeCode || "").toLowerCase().includes(q) ||
+      (tc.userId?.fullName || "").toLowerCase().includes(q) ||
+      (tc.userId?.email || "").toLowerCase().includes(q) ||
+      (tc.specializations?.join(", ") || "").toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -204,11 +217,25 @@ export default function Teacher() {
 
       {activeTab === "list" && (
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <ChalkboardTeacher size={24} className="text-ps-blue" />
-            <h2 className="text-xl" style={{ fontWeight: 300 }}>
-              Danh sách Giáo viên
-            </h2>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
+            <div className="flex items-center gap-2">
+              <ChalkboardTeacher size={24} className="text-ps-blue" />
+              <h2 className="text-xl" style={{ fontWeight: 300 }}>
+                Danh sách Giáo viên
+              </h2>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                <MagnifyingGlass size={16} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo mã, tên, email..."
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[260px] placeholder:text-gray-600"
+              />
+            </div>
           </div>
 
           {loadingList ? (
@@ -229,7 +256,7 @@ export default function Teacher() {
                   </tr>
                 </thead>
                 <tbody>
-                  {teachers.length === 0 ? (
+                  {filteredTeachers.length === 0 ? (
                     <tr>
                       <td
                         colSpan="6"
@@ -239,7 +266,7 @@ export default function Teacher() {
                       </td>
                     </tr>
                   ) : (
-                    teachers.map((tc) => (
+                    filteredTeachers.map((tc) => (
                       <tr
                         key={tc._id}
                         className="border-b border-gray-800/50 hover:bg-gray-800/20"

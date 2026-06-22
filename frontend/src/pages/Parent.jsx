@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UsersThree, Plus, IdentificationBadge, EnvelopeSimple, Phone, LockKey, PencilSimple, Tag, Users } from '@phosphor-icons/react';
+import { UsersThree, Plus, IdentificationBadge, EnvelopeSimple, Phone, LockKey, PencilSimple, Tag, Users, MagnifyingGlass } from '@phosphor-icons/react';
 import api from '../api';
 
 export default function Parent() {
@@ -7,6 +7,7 @@ export default function Parent() {
   const [parents, setParents] = useState([]);
   const [allStudents, setAllStudents] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -134,6 +135,16 @@ export default function Parent() {
     }
   };
 
+  const filteredParents = parents.filter((pr) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (pr.userId?.fullName || '').toLowerCase().includes(q) ||
+      (pr.userId?.email || '').toLowerCase().includes(q) ||
+      (pr.userId?.phone || '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -174,9 +185,23 @@ export default function Parent() {
 
       {activeTab === 'list' && (
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <UsersThree size={24} className="text-ps-blue" />
-            <h2 className="text-xl" style={{ fontWeight: 300 }}>Danh sách Phụ huynh</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
+            <div className="flex items-center gap-2">
+              <UsersThree size={24} className="text-ps-blue" />
+              <h2 className="text-xl" style={{ fontWeight: 300 }}>Danh sách Phụ huynh</h2>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                <MagnifyingGlass size={16} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo tên, email, SĐT..."
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[260px] placeholder:text-gray-600"
+              />
+            </div>
           </div>
 
           {loadingList ? (
@@ -195,14 +220,14 @@ export default function Parent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {parents.length === 0 ? (
+                  {filteredParents.length === 0 ? (
                     <tr>
                       <td colSpan="6" className="py-8 text-center text-gray-500">
                         Chưa có phụ huynh nào.
                       </td>
                     </tr>
                   ) : (
-                    parents.map((pr) => (
+                    filteredParents.map((pr) => (
                       <tr key={pr._id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
                         <td className="py-4 text-white font-medium">{pr.userId?.fullName || '-'}</td>
                         <td className="py-4 text-gray-400">

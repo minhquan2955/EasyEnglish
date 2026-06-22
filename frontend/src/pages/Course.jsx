@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Books, Plus, BookBookmark, Hash, Money, Clock, Tag, PencilSimple } from '@phosphor-icons/react';
+import { Books, Plus, BookBookmark, Hash, Money, Clock, Tag, PencilSimple, MagnifyingGlass } from '@phosphor-icons/react';
 import api from '../api';
 
 export default function Course() {
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'create'
   const [courses, setCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -133,6 +134,16 @@ export default function Course() {
     teens: 'Thiếu niên'
   };
 
+  const filteredCourses = courses.filter((c) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (c.code || '').toLowerCase().includes(q) ||
+      (c.name || '').toLowerCase().includes(q) ||
+      (categoryMap[c.category] || c.category || '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -177,9 +188,23 @@ export default function Course() {
 
       {activeTab === 'list' && (
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Books size={24} className="text-ps-blue" />
-            <h2 className="text-xl" style={{ fontWeight: 300 }}>Danh sách Khóa học</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
+            <div className="flex items-center gap-2">
+              <Books size={24} className="text-ps-blue" />
+              <h2 className="text-xl" style={{ fontWeight: 300 }}>Danh sách Khóa học</h2>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                <MagnifyingGlass size={16} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo mã, tên khóa học..."
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[260px] placeholder:text-gray-600"
+              />
+            </div>
           </div>
 
           {loadingCourses ? (
@@ -199,14 +224,14 @@ export default function Course() {
                   </tr>
                 </thead>
                 <tbody>
-                  {courses.length === 0 ? (
+                  {filteredCourses.length === 0 ? (
                     <tr>
                       <td colSpan="7" className="py-8 text-center text-gray-500">
                         Không có khóa học nào.
                       </td>
                     </tr>
                   ) : (
-                    courses.map((course) => (
+                    filteredCourses.map((course) => (
                       <tr key={course._id} className="border-b border-gray-800/50 hover:bg-gray-800/20">
                         <td className="py-4 text-gray-400">{course.code}</td>
                         <td className="py-4 text-white font-medium">{course.name}</td>
