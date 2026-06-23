@@ -10,7 +10,7 @@ export const getNextSequenceValue = async (sequenceName) => {
   const sequenceDocument = await Counter.findByIdAndUpdate(
     sequenceName,
     { $inc: { sequence_value: 1 } },
-    { new: true, upsert: true } // upsert creates the doc if it doesn't exist
+    { returnDocument: 'after', upsert: true } // upsert creates the doc if it doesn't exist
   );
   return sequenceDocument.sequence_value;
 };
