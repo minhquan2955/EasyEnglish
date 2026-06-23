@@ -1,12 +1,13 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import Teacher from "../models/Teacher.js";
+import { getNextSequenceValue } from "../utils/counter.js";
 
 export const createTeacher = async (req, res, next) => {
   try {
     const {
       fullName, email, phone, password,
-      employeeCode, specializations, certifications, weeklySessionLimit, salary, joinDate
+      specializations, certifications, weeklySessionLimit, salary, joinDate
     } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -15,11 +16,9 @@ export const createTeacher = async (req, res, next) => {
       throw new Error("Email đã được sử dụng");
     }
 
-    const existingTeacher = await Teacher.findOne({ employeeCode });
-    if (existingTeacher) {
-      res.status(400);
-      throw new Error("Mã giáo viên đã tồn tại");
-    }
+    // Auto-generate employee code
+    const seq = await getNextSequenceValue("teacherId");
+    const generatedEmployeeCode = "GV" + String(seq).padStart(4, "0");
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
@@ -35,7 +34,7 @@ export const createTeacher = async (req, res, next) => {
 
     const teacher = await Teacher.create({
       userId: user._id,
-      employeeCode,
+      employeeCode: generatedEmployeeCode,
       specializations: specializations || [],
       certifications: certifications || [],
       weeklySessionLimit,

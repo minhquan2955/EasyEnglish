@@ -1,5 +1,9 @@
 import bcrypt from "bcryptjs"
 import User from "../models/User.js"
+import Student from "../models/Student.js"
+import Teacher from "../models/Teacher.js"
+import Parent from "../models/Parent.js"
+import Enrollment from "../models/Enrollment.js"
 import { generateToken } from "../utils/jwt.js"
 
 
@@ -111,6 +115,51 @@ export const getMe = async (req, res, next) => {
 
         res.json(user);
     } catch(error) {
+        next(error);
+    }
+}
+
+/**
+ * @description Lấy thông tin hồ sơ mở rộng theo role
+ * @route GET /api/auth/me/profile
+ * @access Private - cần đăng nhập
+ */
+export const getMyProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.userId).select("-passwordHash");
+        if (!user) {
+            res.status(404);
+            throw new Error("Không tìm thấy người dùng");
+        }
+
+        let profile = null;
+
+        if (user.role === "student") {
+            const studentProfile = await Student.findOne({ userId: user._id })
+                .populate("parentIds", "fullName email phone");
+            if (studentProfile) {
+                // Fetch enrolled classes
+                const enrollments = await Enrollment.find({
+                    studentId: studentProfile._id,
+                    status: "active"
+                }).populate({ path: "classId", select: "classCode" }).select("classId");
+                const enrolledClasses = enrollments
+                    .filter(e => e.classId?.classCode)
+                    .map(e => e.classId.classCode);
+                profile = { ...studentProfile.toObject(), enrolledClasses };
+            }
+        } else if (user.role === "teacher") {
+            profile = await Teacher.findOne({ userId: user._id });
+        } else if (user.role === "parent") {
+            profile = await Parent.findOne({ userId: user._id })
+                .populate({
+                    path: "studentIds",
+                    populate: { path: "userId", select: "fullName email" }
+                });
+        }
+
+        res.json({ user, profile });
+    } catch (error) {
         next(error);
     }
 }

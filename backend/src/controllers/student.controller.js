@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import Student from "../models/Student.js";
 import Enrollment from "../models/Enrollment.js";
+import { getNextSequenceValue } from "../utils/counter.js";
 
 /**
  * @desc    Admin tạo học sinh mới (tạo cả User và Student profile)
@@ -12,7 +13,7 @@ export const createStudent = async (req, res, next) => {
   try {
     const {
       fullName, email, phone, password,
-      studentCode, dateOfBirth, gender, parentIds, emergencyContact
+      dateOfBirth, gender, parentIds, emergencyContact
     } = req.body;
 
     // Check if email exists
@@ -22,12 +23,9 @@ export const createStudent = async (req, res, next) => {
       throw new Error("Email đã được sử dụng");
     }
 
-    // Check if studentCode exists
-    const existingStudent = await Student.findOne({ studentCode });
-    if (existingStudent) {
-      res.status(400);
-      throw new Error("Mã học sinh đã tồn tại");
-    }
+    // Auto-generate student code
+    const seq = await getNextSequenceValue("studentId");
+    const generatedStudentCode = "HS" + String(seq).padStart(4, "0");
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -46,7 +44,7 @@ export const createStudent = async (req, res, next) => {
     // Create Student profile
     const student = await Student.create({
       userId: user._id,
-      studentCode,
+      studentCode: generatedStudentCode,
       dateOfBirth,
       gender,
       parentIds: parentIds || [],

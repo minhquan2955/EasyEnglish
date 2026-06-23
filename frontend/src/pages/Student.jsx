@@ -361,12 +361,14 @@ export default function Student() {
               <h3 className="text-lg font-medium border-b border-gray-800 pb-2">Hồ sơ học sinh</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Mã Học sinh</label>
-                  <input type="text" name="studentCode" value={formData.studentCode} onChange={handleChange} required
-                    className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
-                    placeholder="VD: HS2024-001" />
-                </div>
+                {editingId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Mã Học sinh</label>
+                    <input type="text" name="studentCode" value={formData.studentCode} onChange={handleChange} required disabled
+                      className="w-full h-12 px-4 bg-gray-900 border border-gray-800 rounded-[4px] text-gray-500 cursor-not-allowed"
+                      placeholder="VD: HS2024-001" />
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Ngày sinh</label>
                   <div className="relative">

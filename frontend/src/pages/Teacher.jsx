@@ -473,20 +473,23 @@ export default function Teacher() {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Mã Giáo viên
-                  </label>
-                  <input
-                    type="text"
-                    name="employeeCode"
-                    value={formData.employeeCode}
-                    onChange={handleChange}
-                    required
-                    className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
-                    placeholder="VD: GV2024-001"
-                  />
-                </div>
+                {editingId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      Mã Giáo viên
+                    </label>
+                    <input
+                      type="text"
+                      name="employeeCode"
+                      value={formData.employeeCode}
+                      onChange={handleChange}
+                      required
+                      disabled
+                      className="w-full h-12 px-4 bg-gray-900 border border-gray-800 rounded-[4px] text-gray-500 cursor-not-allowed"
+                      placeholder="VD: GV2024-001"
+                    />
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
                     Chuyên môn (Cách nhau bằng dấu phẩy)
