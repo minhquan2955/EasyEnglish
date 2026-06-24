@@ -12,7 +12,8 @@ import {
   IdentificationCard,
   CheckSquareOffset,
   Books,
-  EnvelopeSimple
+  EnvelopeSimple,
+  Money
 } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 
@@ -35,6 +36,7 @@ const getSidebarItems = (role) => {
       { name: 'Exam & Grades', path: '/quan-ly-ky-thi', icon: ClipboardText },
       { name: 'Attendance', path: '/quan-ly-diem-danh', icon: CheckSquareOffset },
       { name: 'Enrollment', path: '/quan-ly-ghi-danh', icon: IdentificationCard },
+      { name: 'Tuition', path: '/quan-ly-hoc-phi', icon: Money },
       { name: 'Registration', path: '/quan-ly-dang-ky', icon: EnvelopeSimple },
     ];
   }
@@ -55,6 +57,7 @@ const getSidebarItems = (role) => {
       { name: 'My Schedule', path: '/my-schedule', icon: Calendar },
       { name: 'My Grades', path: '/my-grades', icon: ClipboardText },
       { name: 'My Attendance', path: '/my-attendance', icon: CheckSquareOffset },
+      { name: 'My Tuition', path: '/hoc-phi', icon: Money },
     ];
   }
 
@@ -62,8 +65,10 @@ const getSidebarItems = (role) => {
     return [
       ...baseItems,
       { name: "Children's Schedule", path: '/children-schedule', icon: Calendar },
+      { name: "Children's Classes", path: '/children-classes', icon: Books },
       { name: "Children's Grades", path: '/children-grades', icon: ClipboardText },
       { name: "Children's Attendance", path: '/children-attendance', icon: CheckSquareOffset },
+      { name: 'Tuition', path: '/hoc-phi', icon: Money },
     ];
   }
 

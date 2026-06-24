@@ -30,6 +30,9 @@ import ChildrenGrades from "./pages/ChildrenGrades";
 import Attendance from "./pages/Attendance";
 import MyAttendance from "./pages/MyAttendance";
 import ChildrenAttendance from "./pages/ChildrenAttendance";
+import ChildrenClasses from "./pages/ChildrenClasses";
+import TuitionManager from "./pages/TuitionManager";
+import MyTuition from "./pages/MyTuition";
 
 function App() {
   return (
@@ -66,14 +69,17 @@ function App() {
           <Route path="/quan-ly-diem-danh" element={<Attendance />} />
           <Route path="/quan-ly-ghi-danh" element={<Enrollment />} />
           <Route path="/quan-ly-dang-ky" element={<RegistrationManagement />} />
+          <Route path="/quan-ly-hoc-phi" element={<TuitionManager />} />
 
           {/* Student Specific Routes */}
           <Route path="/my-schedule" element={<MySchedule />} />
           <Route path="/my-grades" element={<MyGrades />} />
           <Route path="/my-attendance" element={<MyAttendance />} />
+          <Route path="/hoc-phi" element={<MyTuition />} />
 
           {/* Parent Specific Routes */}
           <Route path="/children-schedule" element={<ChildrenSchedule />} />
+          <Route path="/children-classes" element={<ChildrenClasses />} />
           <Route path="/children-grades" element={<ChildrenGrades />} />
           <Route path="/children-attendance" element={<ChildrenAttendance />} />
         </Route>

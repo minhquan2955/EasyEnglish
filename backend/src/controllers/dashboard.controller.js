@@ -1,7 +1,8 @@
 import User from "../models/User.js";
+import Payment from "../models/Payment.js";
 
 /**
- * @desc    Get dashboard statistics including user counts and registration chart data
+ * @desc    Get dashboard statistics including user counts, registration chart data, and revenue data
  * @route   GET /api/admin/dashboard-stats
  * @access  Private (Admin only)
  */
@@ -42,6 +43,7 @@ export const getDashboardStats = async (req, res, next) => {
       throw new Error("Invalid period specified. Use 'week', 'month', or 'year'.");
     }
 
+    // User registration chart data
     const chartDataRaw = await User.aggregate([
       {
         $match: {
@@ -59,17 +61,50 @@ export const getDashboardStats = async (req, res, next) => {
       },
     ]);
 
+    // Revenue chart data
+    const revenueDataRaw = await Payment.aggregate([
+      {
+        $match: {
+          paymentDate: { $gte: startDate },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: groupFormat, date: "$paymentDate" } },
+          totalRevenue: { $sum: "$amount" },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    // Total revenue (all time)
+    const totalRevenueResult = await Payment.aggregate([
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+    const totalRevenue = totalRevenueResult[0]?.total || 0;
+
     // Fill in missing dates with 0
     const chartData = [];
+    const revenueChartData = [];
+
     if (period === "year") {
       for (let i = 0; i < 12; i++) {
         const d = new Date(startDate);
         d.setMonth(startDate.getMonth() + i);
         const monthStr = d.toISOString().slice(0, 7); // YYYY-MM
         const found = chartDataRaw.find((item) => item._id === monthStr);
+        const revFound = revenueDataRaw.find((item) => item._id === monthStr);
         chartData.push({
           date: monthStr,
           registrations: found ? found.count : 0,
+        });
+        revenueChartData.push({
+          date: monthStr,
+          revenue: revFound ? revFound.totalRevenue : 0,
+          transactions: revFound ? revFound.count : 0,
         });
       }
     } else {
@@ -79,9 +114,15 @@ export const getDashboardStats = async (req, res, next) => {
         d.setDate(startDate.getDate() + i);
         const dayStr = d.toISOString().slice(0, 10); // YYYY-MM-DD
         const found = chartDataRaw.find((item) => item._id === dayStr);
+        const revFound = revenueDataRaw.find((item) => item._id === dayStr);
         chartData.push({
           date: dayStr,
           registrations: found ? found.count : 0,
+        });
+        revenueChartData.push({
+          date: dayStr,
+          revenue: revFound ? revFound.totalRevenue : 0,
+          transactions: revFound ? revFound.count : 0,
         });
       }
     }
@@ -91,10 +132,13 @@ export const getDashboardStats = async (req, res, next) => {
         students: totalStudents,
         teachers: totalTeachers,
         parents: totalParents,
+        totalRevenue,
       },
       chartData,
+      revenueChartData,
     });
   } catch (error) {
     next(error);
   }
 };
+

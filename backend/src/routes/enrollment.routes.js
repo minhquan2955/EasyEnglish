@@ -13,6 +13,7 @@ import {
   updateEnrollment,
   deleteEnrollment,
   getStudentsByClass,
+  getChildrenEnrollments,
 } from "../controllers/enrollment.controller.js";
 
 const router = Router();
@@ -22,6 +23,10 @@ router.use(protect);
 
 // ---- Routes cho Admin + Teacher (đọc) ----
 router.get("/", authorize("admin", "teacher"), getEnrollments);
+
+// ---- Route cho Parent (đọc) ----
+router.get("/my-children", authorize("parent"), getChildrenEnrollments);
+
 router.get("/:id", authorize("admin", "teacher"), getEnrollmentById);
 
 // ---- Route đặc biệt: xem học sinh trong lớp ----

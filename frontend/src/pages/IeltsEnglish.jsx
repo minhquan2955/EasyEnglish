@@ -103,17 +103,17 @@ export default function IeltsEnglish() {
               </p>
             </div>
 
-            <div className="bg-canvas-dark text-on-dark p-10 rounded-md shadow-2xl flex flex-col items-center text-center transform transition-transform hover:-translate-y-2 border-t-8 border-canvas-light">
-              <div className="w-16 h-16 rounded-full bg-canvas-light text-ps-blue flex items-center justify-center text-[24px] font-bold font-display mb-6">
+            <div className="bg-canvas-light text-ink p-10 rounded-md shadow-2xl flex flex-col items-center text-center transform transition-transform hover:-translate-y-2 border-t-8 border-ps-blue">
+              <div className="w-16 h-16 rounded-full bg-ps-blue text-canvas-light flex items-center justify-center text-[24px] font-bold font-display mb-6">
                 2
               </div>
-              <h3 className="text-[24px] font-display font-bold text-canvas-light mb-2">
+              <h3 className="text-[24px] font-display font-bold text-ps-blue mb-2">
                 IELTS Pathway
               </h3>
-              <p className="text-[14px] font-bold uppercase tracking-wider mb-6 text-ps-blue">
+              <p className="text-[14px] font-bold uppercase tracking-wider mb-6 opacity-60">
                 Lộ trình 2.5 năm
               </p>
-              <p className="text-[16px] text-on-dark-mute leading-relaxed">
+              <p className="text-[16px] text-body-light leading-relaxed">
                 Khoá học chuyên sâu giúp học viên hoàn thiện kỹ năng và chiến
                 lược bài thi IELTS.
               </p>

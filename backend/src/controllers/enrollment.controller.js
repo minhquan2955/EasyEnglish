@@ -1,6 +1,7 @@
 import Enrollment from "../models/Enrollment.js";
 import Student from "../models/Student.js";
 import Class from "../models/Class.js";
+import Parent from "../models/Parent.js";
 // ==================== CREATE ====================
 /**
  * @desc    Admin ghi danh học sinh vào lớp
@@ -277,6 +278,58 @@ export const getStudentsByClass = async (req, res, next) => {
       currentCount: enrollments.length,
       students: enrollments,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==================== PARENT ROUTES ====================
+/**
+ * @desc    Lấy danh sách các lớp con đang học (cho phụ huynh)
+ * @route   GET /api/enrollments/my-children
+ * @access  Private (Parent only)
+ */
+export const getChildrenEnrollments = async (req, res, next) => {
+  try {
+    const parent = await Parent.findOne({ userId: req.user.userId }).populate({
+      path: "studentIds",
+      select: "studentCode",
+      populate: { path: "userId", select: "fullName" },
+    });
+
+    if (!parent) {
+      res.status(404);
+      throw new Error("Không tìm thấy hồ sơ phụ huynh");
+    }
+
+    if (!parent.studentIds || parent.studentIds.length === 0) {
+      return res.status(200).json({ children: [] });
+    }
+
+    const children = [];
+    for (const student of parent.studentIds) {
+      const enrollments = await Enrollment.find({
+        studentId: student._id,
+        status: "active",
+      }).populate({
+        path: "classId",
+        populate: [
+          { path: "courseId", select: "name code description tuitionFee" },
+          { path: "teacherId", populate: { path: "userId", select: "fullName" } }
+        ]
+      });
+
+      children.push({
+        student: {
+          _id: student._id,
+          studentCode: student.studentCode,
+          fullName: student.userId?.fullName,
+        },
+        enrollments,
+      });
+    }
+
+    res.status(200).json({ children });
   } catch (error) {
     next(error);
   }

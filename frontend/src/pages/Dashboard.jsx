@@ -3,10 +3,13 @@ import {
   Users,
   ChalkboardTeacher,
   UsersThree,
+  Money,
 } from "@phosphor-icons/react";
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -102,7 +105,7 @@ const Dashboard = () => {
       )}
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <StatCard
           title="Tổng Học Sinh"
           value={loading ? "..." : stats.totals.students}
@@ -120,6 +123,16 @@ const Dashboard = () => {
           value={loading ? "..." : stats.totals.parents}
           icon={UsersThree}
           colorClass="bg-emerald-600"
+        />
+        <StatCard
+          title="Tổng Doanh Thu"
+          value={
+            loading
+              ? "..."
+              : (stats.totals.totalRevenue || 0).toLocaleString("vi-VN") + " đ"
+          }
+          icon={Money}
+          colorClass="bg-amber-600"
         />
       </div>
 
@@ -227,6 +240,82 @@ const Dashboard = () => {
                   fill="url(#colorRegs)"
                 />
               </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
+      {/* Revenue Chart Section */}
+      <div
+        className="p-8 mt-8"
+        style={{
+          backgroundColor: "#121314",
+          borderRadius: "8px",
+        }}
+      >
+        <h2
+          className="text-2xl text-white mb-8"
+          style={{ fontWeight: 300, letterSpacing: "0.1px" }}
+        >
+          Doanh thu học phí
+        </h2>
+
+        <div className="h-[350px] w-full">
+          {loading ? (
+            <div className="h-full w-full flex items-center justify-center text-gray-500">
+              Đang tải dữ liệu...
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={stats.revenueChartData || []}
+                margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#3f3f46"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="#a1a1aa"
+                  tick={{ fill: "#a1a1aa", fontSize: 12 }}
+                  tickMargin={12}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke="#a1a1aa"
+                  tick={{ fill: "#a1a1aa", fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) =>
+                    v >= 1000000
+                      ? `${(v / 1000000).toFixed(1)}tr`
+                      : v >= 1000
+                        ? `${(v / 1000).toFixed(0)}k`
+                        : v
+                  }
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#121314",
+                    border: "1px solid #3f3f46",
+                    borderRadius: "8px",
+                    color: "#fff",
+                  }}
+                  formatter={(value) => [
+                    value.toLocaleString("vi-VN") + " đ",
+                    "Doanh thu",
+                  ]}
+                />
+                <Bar
+                  dataKey="revenue"
+                  name="Doanh thu"
+                  fill="#d97706"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
             </ResponsiveContainer>
           )}
         </div>
