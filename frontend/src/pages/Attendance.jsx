@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api";
+import ZaloMessageButton from "../components/ZaloMessageButton";
 
 export default function Attendance() {
   const { user } = useAuth();
@@ -176,7 +177,7 @@ export default function Attendance() {
       <div className="flex items-center justify-between">
         <div>
           <h1
-            className="text-3xl text-white tracking-tight flex items-center gap-3"
+            className="text-3xl text-black tracking-tight flex items-center gap-3"
             style={{ fontWeight: 300 }}
           >
             <CheckSquareOffset size={32} className="text-ps-blue" />
@@ -341,6 +342,7 @@ export default function Attendance() {
                         Trạng thái
                       </th>
                       <th className="px-6 py-4 font-medium">Ghi chú</th>
+                      <th className="px-6 py-4 font-medium text-center">Zalo</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800">
@@ -409,6 +411,18 @@ export default function Attendance() {
                               }
                               placeholder="Có phép / Không phép..."
                               className="w-full bg-[#121314] text-white border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ps-blue"
+                            />
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <ZaloMessageButton
+                              studentName={student.userId?.fullName || ""}
+                              studentPhone={student.userId?.phone || ""}
+                              parents={(student.parentIds || []).map((p) => ({
+                                fullName: p.fullName || "",
+                                phone: p.phone || "",
+                              }))}
+                              emergencyContact={student.emergencyContact}
+                              messageTemplate={`Chào bạn, trung tâm EasyEnglish xin thông báo học sinh ${student.userId?.fullName || ""} đã vắng mặt buổi học ngày ${selectedSchedule ? new Date(selectedSchedule.date).toLocaleDateString("vi-VN") : ""} (Buổi ${selectedSchedule?.sessionNumber || ""}). Vui lòng liên hệ trung tâm nếu cần thêm thông tin.`}
                             />
                           </td>
                         </tr>

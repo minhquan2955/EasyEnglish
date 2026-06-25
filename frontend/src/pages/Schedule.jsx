@@ -222,7 +222,7 @@ export default function Schedule() {
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1
-            className="text-4xl mb-2 text-white"
+            className="text-4xl mb-2 text-black"
             style={{ fontWeight: 300, letterSpacing: "0.1px" }}
           >
             Quản lý Lịch học

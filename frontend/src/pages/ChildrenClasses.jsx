@@ -131,6 +131,22 @@ export default function ChildrenClasses() {
                         <span className="text-white font-medium">{teacher?.userId?.fullName || "Đang cập nhật"}</span>
                       </div>
                       
+                      {teacher?.userId?.phone && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-[18px]" />
+                          <span className="text-gray-400 w-24">SĐT:</span>
+                          <span className="text-white font-medium">{teacher.userId.phone}</span>
+                        </div>
+                      )}
+                      
+                      {teacher?.userId?.email && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-[18px]" />
+                          <span className="text-gray-400 w-24">Email:</span>
+                          <span className="text-white font-medium">{teacher.userId.email}</span>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-3 text-sm">
                         <CalendarBlank size={18} className="text-ps-blue" />
                         <span className="text-gray-400 w-24">Lịch học:</span>

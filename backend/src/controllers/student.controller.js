@@ -148,7 +148,10 @@ export const updateStudent = async (req, res, next) => {
     if (dateOfBirth) student.dateOfBirth = dateOfBirth;
     if (gender) student.gender = gender;
     if (parentIds) student.parentIds = parentIds;
-    if (emergencyContact) student.emergencyContact = emergencyContact;
+    if (emergencyContact) {
+      student.emergencyContact = emergencyContact;
+      student.markModified('emergencyContact');
+    }
     await student.save();
 
     // Update User fields

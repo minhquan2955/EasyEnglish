@@ -32,6 +32,13 @@ export const createClass = async (req, res, next) => {
       endDate,
       schedule,
     } = req.body;
+
+    // --- Kiểm tra startDate và endDate ---
+    if (new Date(startDate) > new Date(endDate)) {
+      res.status(400);
+      throw new Error("Ngày bắt đầu không thể sau ngày kết thúc");
+    }
+
     // --- Kiểm tra classCode trùng ---
     const existingClass = await Class.findOne({ classCode });
     if (existingClass) {
@@ -224,6 +231,12 @@ export const updateClass = async (req, res, next) => {
     const finalSchedule = req.body.schedule || currentClass.schedule;
     const finalStartDate = req.body.startDate || currentClass.startDate;
     const finalEndDate = req.body.endDate || currentClass.endDate;
+
+    // --- Kiểm tra startDate và endDate ---
+    if (new Date(finalStartDate) > new Date(finalEndDate)) {
+      res.status(400);
+      throw new Error("Ngày bắt đầu không thể sau ngày kết thúc");
+    }
 
     const conflictCheck = await checkScheduleConflict({
       teacherId: finalTeacherId,

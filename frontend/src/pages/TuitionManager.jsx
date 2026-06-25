@@ -10,6 +10,7 @@ import {
   Clock,
 } from "@phosphor-icons/react";
 import api from "../api";
+import ZaloMessageButton from "../components/ZaloMessageButton";
 
 const statusConfig = {
   paid: {
@@ -116,7 +117,7 @@ export default function TuitionManager() {
     setLoadingHistory(true);
     try {
       const { data } = await api.get(
-        `/tuition/admin/history/${item.student._id}/${item.class._id}`
+        `/tuition/admin/history/${item.student._id}/${item.class._id}`,
       );
       setPaymentHistory(data.payments);
     } catch (err) {
@@ -146,14 +147,14 @@ export default function TuitionManager() {
   const totalPaid = tuitionList.reduce((s, i) => s + i.totalPaid, 0);
   const totalRemaining = tuitionList.reduce(
     (s, i) => s + Math.max(0, i.remaining),
-    0
+    0,
   );
 
   return (
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8">
         <h1
-          className="text-4xl mb-2 text-white"
+          className="text-4xl mb-2 text-black"
           style={{ fontWeight: 300, letterSpacing: "0.1px" }}
         >
           Quản lý Học phí
@@ -179,28 +180,19 @@ export default function TuitionManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
           <p className="text-gray-400 text-sm mb-1">Tổng học phí</p>
-          <p
-            className="text-2xl text-white"
-            style={{ fontWeight: 300 }}
-          >
+          <p className="text-2xl text-white" style={{ fontWeight: 300 }}>
             {formatCurrency(totalFee)}
           </p>
         </div>
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
           <p className="text-gray-400 text-sm mb-1">Đã thu</p>
-          <p
-            className="text-2xl text-green-400"
-            style={{ fontWeight: 300 }}
-          >
+          <p className="text-2xl text-green-400" style={{ fontWeight: 300 }}>
             {formatCurrency(totalPaid)}
           </p>
         </div>
         <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
           <p className="text-gray-400 text-sm mb-1">Còn nợ</p>
-          <p
-            className="text-2xl text-red-400"
-            style={{ fontWeight: 300 }}
-          >
+          <p className="text-2xl text-red-400" style={{ fontWeight: 300 }}>
             {formatCurrency(totalRemaining)}
           </p>
         </div>
@@ -250,10 +242,7 @@ export default function TuitionManager() {
               <tbody>
                 {filteredList.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="9"
-                      className="py-8 text-center text-gray-500"
-                    >
+                    <td colSpan="9" className="py-8 text-center text-gray-500">
                       Không có dữ liệu học phí.
                     </td>
                   </tr>
@@ -285,9 +274,7 @@ export default function TuitionManager() {
                           {formatCurrency(item.totalPaid)}
                         </td>
                         <td className="py-4 text-right text-red-400">
-                          {formatCurrency(
-                            Math.max(0, item.remaining)
-                          )}
+                          {formatCurrency(Math.max(0, item.remaining))}
                         </td>
                         <td className="py-4 text-center">
                           <span
@@ -299,6 +286,13 @@ export default function TuitionManager() {
                         </td>
                         <td className="py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
+                            <ZaloMessageButton
+                              studentName={item.student.fullName}
+                              studentPhone={item.student.phone}
+                              parents={item.student.parents || []}
+                              emergencyContact={item.student.emergencyContact}
+                              messageTemplate={`Chào bạn, trung tâm EasyEnglish xin nhắc lịch đóng học phí khóa ${item.class.courseName} (Lớp ${item.class.classCode}), số tiền còn lại: ${formatCurrency(Math.max(0, item.remaining))}. Vui lòng thanh toán sớm. Xin cảm ơn!`}
+                            />
                             <button
                               onClick={() => openHistoryModal(item)}
                               className="p-2 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
@@ -311,10 +305,7 @@ export default function TuitionManager() {
                                 onClick={() => openPayModal(item)}
                                 className="px-3 py-1.5 bg-ps-blue text-white text-xs rounded hover:bg-ps-blue/80 transition-colors inline-flex items-center gap-1"
                               >
-                                <CurrencyCircleDollar
-                                  size={14}
-                                  weight="bold"
-                                />
+                                <CurrencyCircleDollar size={14} weight="bold" />
                                 Thu tiền
                               </button>
                             )}
@@ -473,8 +464,7 @@ export default function TuitionManager() {
               <p>
                 <span className="text-gray-400">Lớp:</span>{" "}
                 <span className="text-white">
-                  {historyItem.class.classCode} —{" "}
-                  {historyItem.class.courseName}
+                  {historyItem.class.classCode} — {historyItem.class.courseName}
                 </span>
               </p>
             </div>

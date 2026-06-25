@@ -87,7 +87,7 @@ const Dashboard = () => {
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8">
         <h1
-          className="text-4xl mb-2 text-white"
+          className="text-4xl mb-2 text-black"
           style={{ fontWeight: 300, letterSpacing: "0.1px" }}
         >
           Dashboard

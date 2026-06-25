@@ -14,7 +14,9 @@ export const getTuitionList = async (req, res, next) => {
     const enrollments = await Enrollment.find({ status: "active" })
       .populate({
         path: "studentId",
-        populate: { path: "userId", select: "fullName email phone" },
+        populate: [
+          { path: "userId", select: "fullName email phone" }
+        ],
       })
       .populate({
         path: "classId",
@@ -42,6 +44,25 @@ export const getTuitionList = async (req, res, next) => {
       paymentMap[key] = p;
     });
 
+    // Fetch parents for these students dynamically because Parent model stores studentIds
+    const studentIds = [...new Set(enrollments.map(e => e.studentId?._id?.toString()).filter(Boolean))];
+    const parents = await Parent.find({ studentIds: { $in: studentIds } }).populate("userId", "fullName phone");
+    const parentMap = {};
+    parents.forEach(p => {
+      if (p.studentIds) {
+        p.studentIds.forEach(sid => {
+          const id = sid.toString();
+          if (!parentMap[id]) parentMap[id] = [];
+          if (p.userId) {
+            parentMap[id].push({
+              fullName: p.userId.fullName || "—",
+              phone: p.userId.phone || ""
+            });
+          }
+        });
+      }
+    });
+
     // Combine enrollment + payment data
     const tuitionList = enrollments
       .filter((e) => e.studentId && e.classId?.courseId)
@@ -62,6 +83,8 @@ export const getTuitionList = async (req, res, next) => {
             fullName: enrollment.studentId.userId?.fullName || "—",
             email: enrollment.studentId.userId?.email || "—",
             phone: enrollment.studentId.userId?.phone || "—",
+            emergencyContact: enrollment.studentId.emergencyContact || null,
+            parents: parentMap[enrollment.studentId._id.toString()] || [],
           },
           class: {
             _id: enrollment.classId._id,

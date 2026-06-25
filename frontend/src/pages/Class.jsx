@@ -208,7 +208,7 @@ export default function Class() {
     <div className="p-8 max-w-7xl mx-auto text-white">
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-4xl mb-2 text-white" style={{ fontWeight: 300, letterSpacing: '0.1px' }}>
+          <h1 className="text-4xl mb-2 text-black" style={{ fontWeight: 300, letterSpacing: '0.1px' }}>
             Quản lý Lớp học
           </h1>
           <p className="text-gray-400">Xem danh sách lớp học và sắp xếp lịch dạy.</p>

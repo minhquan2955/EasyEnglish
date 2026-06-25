@@ -24,6 +24,7 @@ export default function Grade() {
   const [success, setSuccess] = useState('');
 
   // Form State for Exam (Level 3)
+  const [isEditMode, setIsEditMode] = useState(false);
   const [examForm, setExamForm] = useState({
     title: '',
     assessmentType: 'quiz',
@@ -146,11 +147,13 @@ export default function Grade() {
 
   const handleCreateExam = () => {
     setSelectedExam(null);
+    setIsEditMode(true);
     fetchStudentsAndGrades(null);
   };
 
   const handleEditExam = (exam) => {
     setSelectedExam(exam);
+    setIsEditMode(false);
     fetchStudentsAndGrades(exam);
   };
 
@@ -201,10 +204,19 @@ export default function Grade() {
       });
 
       setSuccess('Lưu bảng điểm thành công!');
+      
+      // Update the selectedExam to the saved data so view mode shows correct info
+      setSelectedExam({
+        title: examForm.title,
+        assessmentType: examForm.assessmentType,
+        maxScore: examForm.maxScore,
+        studentCount: scores.length
+      });
+      setIsEditMode(false);
+
       setTimeout(() => {
         setSuccess('');
         fetchExams(selectedClass._id);
-        setCurrentLevel(2);
       }, 1500);
     } catch (err) {
       console.error(err);
@@ -219,7 +231,7 @@ export default function Grade() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-white tracking-tight" style={{ fontWeight: 300 }}>
+          <h1 className="text-3xl text-black tracking-tight" style={{ fontWeight: 300 }}>
             Quản lý Điểm & Bài kiểm tra
           </h1>
           <p className="text-gray-400 mt-1">
@@ -372,42 +384,61 @@ export default function Grade() {
                   <ClipboardText size={20} className="text-ps-blue" />
                   Thông tin bài kiểm tra
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Tên bài kiểm tra <span className="text-[#c81b3a]">*</span></label>
-                    <input
-                      type="text"
-                      value={examForm.title}
-                      onChange={(e) => setExamForm(p => ({ ...p, title: e.target.value }))}
-                      disabled={!!selectedExam} // Không cho sửa tên nếu đang edit (vì title dùng để gom nhóm)
-                      placeholder="VD: Midterm Test 1"
-                      className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
-                    />
+                {!isEditMode ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <span className="block text-sm text-gray-400 mb-1">Tên bài kiểm tra</span>
+                      <div className="text-white font-medium text-lg">{examForm.title}</div>
+                    </div>
+                    <div>
+                      <span className="block text-sm text-gray-400 mb-1">Loại bài</span>
+                      <div className="text-white font-medium capitalize">
+                        {assessmentTypes.find(t => t.value === examForm.assessmentType)?.label || examForm.assessmentType}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="block text-sm text-gray-400 mb-1">Điểm tối đa</span>
+                      <div className="text-white font-medium">Hệ số {examForm.maxScore}</div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Loại bài <span className="text-[#c81b3a]">*</span></label>
-                    <select
-                      value={examForm.assessmentType}
-                      onChange={(e) => setExamForm(p => ({ ...p, assessmentType: e.target.value }))}
-                      disabled={!!selectedExam}
-                      className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
-                    >
-                      {assessmentTypes.map(t => (
-                        <option key={t.value} value={t.value}>{t.label}</option>
-                      ))}
-                    </select>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Tên bài kiểm tra <span className="text-[#c81b3a]">*</span></label>
+                      <input
+                        type="text"
+                        value={examForm.title}
+                        onChange={(e) => setExamForm(p => ({ ...p, title: e.target.value }))}
+                        disabled={!!selectedExam}
+                        placeholder="VD: Midterm Test 1"
+                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Loại bài <span className="text-[#c81b3a]">*</span></label>
+                      <select
+                        value={examForm.assessmentType}
+                        onChange={(e) => setExamForm(p => ({ ...p, assessmentType: e.target.value }))}
+                        disabled={!!selectedExam}
+                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
+                      >
+                        {assessmentTypes.map(t => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Điểm tối đa (Max Score) <span className="text-[#c81b3a]">*</span></label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={examForm.maxScore}
+                        onChange={(e) => setExamForm(p => ({ ...p, maxScore: e.target.value }))}
+                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Điểm tối đa (Max Score) <span className="text-[#c81b3a]">*</span></label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={examForm.maxScore}
-                      onChange={(e) => setExamForm(p => ({ ...p, maxScore: e.target.value }))}
-                      className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors"
-                    />
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Grading Table */}
@@ -444,25 +475,37 @@ export default function Grade() {
                               <div className="text-xs text-gray-500">{student.studentCode}</div>
                             </td>
                             <td className="px-6 py-4">
-                              <input
-                                type="number"
-                                min="0"
-                                max={examForm.maxScore}
-                                step="0.5"
-                                value={gradeData.score}
-                                onChange={(e) => handleGradeChange(sId, 'score', e.target.value)}
-                                className="w-full h-9 px-3 bg-black border border-gray-700 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
-                                placeholder="Trống"
-                              />
+                              {!isEditMode ? (
+                                <span className={gradeData.score !== '' ? 'text-white font-medium' : 'text-gray-500 italic'}>
+                                  {gradeData.score !== '' ? gradeData.score : 'Chưa nhập'}
+                                </span>
+                              ) : (
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={examForm.maxScore}
+                                  step="0.5"
+                                  value={gradeData.score}
+                                  onChange={(e) => handleGradeChange(sId, 'score', e.target.value)}
+                                  className="w-full h-9 px-3 bg-black border border-gray-700 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
+                                  placeholder="Trống"
+                                />
+                              )}
                             </td>
                             <td className="px-6 py-4">
-                              <input
-                                type="text"
-                                value={gradeData.feedback}
-                                onChange={(e) => handleGradeChange(sId, 'feedback', e.target.value)}
-                                className="w-full h-9 px-3 bg-black border border-gray-700 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
-                                placeholder="Nhận xét (không bắt buộc)..."
-                              />
+                              {!isEditMode ? (
+                                <span className="text-gray-300">
+                                  {gradeData.feedback || '—'}
+                                </span>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={gradeData.feedback}
+                                  onChange={(e) => handleGradeChange(sId, 'feedback', e.target.value)}
+                                  className="w-full h-9 px-3 bg-black border border-gray-700 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
+                                  placeholder="Nhận xét (không bắt buộc)..."
+                                />
+                              )}
                             </td>
                           </tr>
                         );
@@ -474,20 +517,37 @@ export default function Grade() {
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
-                <button
-                  type="button"
-                  onClick={() => setCurrentLevel(2)}
-                  className="px-6 h-10 text-sm font-medium text-white bg-transparent hover:bg-gray-800 rounded-full transition-colors"
-                >
-                  Hủy bỏ
-                </button>
-                <button
-                  onClick={handleSaveGrades}
-                  disabled={loading}
-                  className="px-8 h-10 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center gap-2"
-                >
-                  {loading ? 'Đang lưu...' : 'Lưu bảng điểm'}
-                </button>
+                {!isEditMode ? (
+                  <button
+                    onClick={() => setIsEditMode(true)}
+                    className="px-8 h-10 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors flex items-center gap-2"
+                  >
+                    Chỉnh sửa / Nhập điểm
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!selectedExam) {
+                          setCurrentLevel(2); // Cancel new exam
+                        } else {
+                          setIsEditMode(false); // Cancel edit
+                        }
+                      }}
+                      className="px-6 h-10 text-sm font-medium text-white bg-transparent hover:bg-gray-800 rounded-full transition-colors"
+                    >
+                      Hủy bỏ
+                    </button>
+                    <button
+                      onClick={handleSaveGrades}
+                      disabled={loading}
+                      className="px-8 h-10 bg-[#00a854] text-white rounded-full font-bold text-sm hover:bg-[#008f47] active:bg-[#007339] transition-colors disabled:opacity-70 flex items-center gap-2"
+                    >
+                      {loading ? 'Đang lưu...' : 'Lưu bảng điểm'}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}

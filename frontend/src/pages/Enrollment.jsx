@@ -168,7 +168,7 @@ export default function Enrollment() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-white tracking-tight" style={{ fontWeight: 300 }}>
+          <h1 className="text-3xl text-black tracking-tight" style={{ fontWeight: 300 }}>
             Quản lý Ghi danh
           </h1>
           <p className="text-gray-400 mt-1">

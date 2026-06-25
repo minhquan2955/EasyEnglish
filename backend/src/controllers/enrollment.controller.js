@@ -265,13 +265,41 @@ export const getStudentsByClass = async (req, res, next) => {
     })
       .populate({
         path: "studentId",
-        select: "studentCode dateOfBirth gender",
-        populate: {
-          path: "userId",
-          select: "fullName email phone",
-        },
+        select: "studentCode dateOfBirth gender emergencyContact parentIds userId",
+        populate: [
+          {
+            path: "userId",
+            select: "fullName email phone",
+          }
+        ],
       })
-      .sort({ enrollDate: 1 }); // Sắp xếp theo ngày ghi danh (cũ => mới)
+      .sort({ enrollDate: 1 })
+      .lean(); // Use lean to allow mutation
+
+    // Fetch parents dynamically
+    const studentIds = [...new Set(enrollments.map(e => e.studentId?._id?.toString()).filter(Boolean))];
+    const parents = await Parent.find({ studentIds: { $in: studentIds } }).populate("userId", "fullName phone");
+    const parentMap = {};
+    parents.forEach(p => {
+      if (p.studentIds) {
+        p.studentIds.forEach(sid => {
+          const id = sid.toString();
+          if (!parentMap[id]) parentMap[id] = [];
+          if (p.userId) {
+            parentMap[id].push({
+              fullName: p.userId.fullName || "—",
+              phone: p.userId.phone || ""
+            });
+          }
+        });
+      }
+    });
+
+    enrollments.forEach(e => {
+      if (e.studentId) {
+        e.studentId.parentIds = parentMap[e.studentId._id.toString()] || [];
+      }
+    });
     res.status(200).json({
       classCode: classDoc.classCode,
       maxStudents: classDoc.maxStudents,
@@ -315,7 +343,7 @@ export const getChildrenEnrollments = async (req, res, next) => {
         path: "classId",
         populate: [
           { path: "courseId", select: "name code description tuitionFee" },
-          { path: "teacherId", populate: { path: "userId", select: "fullName" } }
+          { path: "teacherId", populate: { path: "userId", select: "fullName phone email" } }
         ]
       });
 
