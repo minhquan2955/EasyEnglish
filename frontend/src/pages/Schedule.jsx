@@ -14,6 +14,7 @@ import {
   MapPin,
   BookOpen,
   Tag,
+  Trash,
 } from "@phosphor-icons/react";
 import api from "../api";
 
@@ -67,6 +68,10 @@ export default function Schedule() {
   // Generate state
   const [generating, setGenerating] = useState(false);
   const [genMsg, setGenMsg] = useState("");
+
+  // Delete state
+  const [deleteConfirmClass, setDeleteConfirmClass] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Fetch summary list
   const fetchSummaries = async () => {
@@ -144,6 +149,22 @@ export default function Schedule() {
       setGenMsg(`Error:${err.response?.data?.message || err.message}`);
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Delete batch schedule
+  const handleDeleteSchedules = async (classId) => {
+    setDeleteLoading(true);
+    setGenMsg("");
+    try {
+      await api.delete(`/schedules/class/${classId}`);
+      setGenMsg("Xóa lịch học thành công!");
+      fetchSummaries();
+    } catch (err) {
+      setGenMsg(`Error:${err.response?.data?.message || err.message}`);
+    } finally {
+      setDeleteLoading(false);
+      setDeleteConfirmClass(null);
     }
   };
 
@@ -305,13 +326,14 @@ export default function Schedule() {
                       <th className="pb-3 font-medium">Đã hủy</th>
                       <th className="pb-3 font-medium">Ngày bắt đầu</th>
                       <th className="pb-3 font-medium">Ngày kết thúc</th>
+                      <th className="pb-3 font-medium text-right">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
                     {summaries.length === 0 ? (
                       <tr>
                         <td
-                          colSpan="8"
+                          colSpan="9"
                           className="py-8 text-center text-gray-500"
                         >
                           Chưa có lịch nào. Hãy chọn một lớp ở bên dưới để tạo
@@ -359,6 +381,15 @@ export default function Schedule() {
                             {s.lastDate
                               ? new Date(s.lastDate).toLocaleDateString("vi-VN")
                               : "-"}
+                          </td>
+                          <td className="py-4 text-right">
+                            <button
+                              onClick={() => setDeleteConfirmClass({ id: s.classId, code: s.classCode })}
+                              className="p-2 text-gray-500 hover:text-[#c81b3a] hover:bg-[#c81b3a]/10 rounded transition-colors"
+                              title="Xóa toàn bộ lịch học của lớp này"
+                            >
+                              <Trash size={18} />
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -662,6 +693,50 @@ export default function Schedule() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmClass && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          onClick={() => setDeleteConfirmClass(null)}
+        >
+          <div
+            className="bg-[#1a1b1e] rounded-[12px] border border-gray-700 p-8 w-full max-w-md text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto w-12 h-12 bg-[#c81b3a]/10 rounded-full flex items-center justify-center mb-4 text-[#c81b3a]">
+              <Trash size={24} />
+            </div>
+            <h3 className="text-xl text-white mb-2" style={{ fontWeight: 400 }}>
+              Xóa toàn bộ lịch học
+            </h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Bạn có chắc chắn muốn xóa toàn bộ lịch học của lớp{" "}
+              <span className="text-white font-medium">
+                {deleteConfirmClass.code}
+              </span>
+              ? Hành động này không thể hoàn tác.
+            </p>
+            
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setDeleteConfirmClass(null)}
+                disabled={deleteLoading}
+                className="px-6 py-2 rounded-full border border-gray-700 text-gray-300 hover:bg-gray-800 transition-colors text-sm"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => handleDeleteSchedules(deleteConfirmClass.id)}
+                disabled={deleteLoading}
+                className="px-6 py-2 rounded-full bg-[#c81b3a] text-white hover:bg-[#a6152e] transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-70"
+              >
+                {deleteLoading ? "Đang xóa..." : "Xóa lịch học"}
+              </button>
+            </div>
           </div>
         </div>
       )}
