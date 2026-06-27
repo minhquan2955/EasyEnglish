@@ -14,6 +14,7 @@ import {
   updateAttendance,
   getMyAttendance,
   getChildrenAttendance,
+  getClassAttendanceStats,
 } from "../controllers/attendance.controller.js";
 
 const router = Router();
@@ -38,6 +39,13 @@ router.get(
   "/schedule/:scheduleId",
   authorize("admin", "teacher"),
   getAttendanceBySchedule,
+);
+
+// Thống kê điểm danh theo lớp
+router.get(
+  "/class/:classId/stats",
+  authorize("admin", "teacher"),
+  getClassAttendanceStats,
 );
 
 // ---- CRUD ----

@@ -4,6 +4,7 @@ import Enrollment from "../models/Enrollment.js";
 import Student from "../models/Student.js";
 import Parent from "../models/Parent.js";
 import { bulkCheckIn } from "../services/attendance.service.js";
+import mongoose from "mongoose";
 
 // ==================== BULK CHECK-IN ====================
 /**
@@ -97,6 +98,41 @@ export const getAttendanceBySchedule = async (req, res, next) => {
       },
       attendances,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Lấy thống kê điểm danh của 1 lớp (số buổi nghỉ)
+ * @route   GET /api/attendances/class/:classId/stats
+ * @access  Private (Admin, Teacher)
+ */
+export const getClassAttendanceStats = async (req, res, next) => {
+  try {
+    const { classId } = req.params;
+
+    const stats = await Attendance.aggregate([
+      {
+        $match: {
+          classId: new mongoose.Types.ObjectId(classId),
+          status: "absent",
+        },
+      },
+      {
+        $group: {
+          _id: "$studentId",
+          absentCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const formattedStats = {};
+    stats.forEach((stat) => {
+      formattedStats[stat._id.toString()] = stat.absentCount;
+    });
+
+    res.status(200).json({ stats: formattedStats });
   } catch (error) {
     next(error);
   }

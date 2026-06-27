@@ -22,6 +22,7 @@ export default function Attendance() {
   const [enrollments, setEnrollments] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
   const [attendanceRecords, setAttendanceRecords] = useState({}); // studentId -> { status, notes }
+  const [absentStats, setAbsentStats] = useState({}); // studentId -> absentCount
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,6 +64,16 @@ export default function Attendance() {
         const { data: enrollData } = await api.get(
           `/enrollments/class/${selectedClass._id}/students`
         );
+
+        // Fetch absent stats
+        try {
+          const { data: statsData } = await api.get(
+            `/attendances/class/${selectedClass._id}/stats`
+          );
+          setAbsentStats(statsData.stats || {});
+        } catch (statsErr) {
+          console.error("Lỗi khi lấy thống kê điểm danh", statsErr);
+        }
 
         const sortedSchedules = (scheduleData.schedules || []).sort(
           (a, b) => new Date(b.date) - new Date(a.date)
@@ -339,6 +350,9 @@ export default function Attendance() {
                       <th className="px-6 py-4 font-medium">Mã HS</th>
                       <th className="px-6 py-4 font-medium">Họ tên</th>
                       <th className="px-6 py-4 font-medium text-center">
+                        Số buổi nghỉ
+                      </th>
+                      <th className="px-6 py-4 font-medium text-center">
                         Trạng thái
                       </th>
                       <th className="px-6 py-4 font-medium">Ghi chú</th>
@@ -363,6 +377,19 @@ export default function Attendance() {
                           </td>
                           <td className="px-6 py-4 font-medium text-white">
                             {student.userId?.fullName}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            {(() => {
+                              const absentCount = absentStats[student._id] || 0;
+                              const isHighAbsence = absentCount >= 3;
+                              return (
+                                <span className={`inline-flex items-center justify-center min-w-[2rem] h-8 rounded-full px-2 font-medium text-sm ${
+                                  isHighAbsence ? 'bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20' : 'bg-gray-800 text-gray-300'
+                                }`}>
+                                  {absentCount}
+                                </span>
+                              );
+                            })()}
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-4">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Chalkboard, Plus, Users, Hash, Door, CalendarBlank, Clock, UserSquare, PencilSimple, Tag, MagnifyingGlass } from '@phosphor-icons/react';
+import { Chalkboard, Plus, Users, Hash, Door, CalendarBlank, Clock, UserSquare, PencilSimple, Tag, MagnifyingGlass, X } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
 
@@ -14,6 +14,12 @@ export default function Class() {
   const [loadingDeps, setLoadingDeps] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState(null);
+
+  const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
+  const [selectedClassForStudents, setSelectedClassForStudents] = useState(null);
+  const [classStudents, setClassStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [studentError, setStudentError] = useState('');
 
   const [formData, setFormData] = useState({
     classCode: '',
@@ -129,6 +135,23 @@ export default function Class() {
     setError('');
     setSuccess('');
     setActiveTab('create');
+  };
+
+  const handleViewStudents = async (cls) => {
+    setSelectedClassForStudents(cls);
+    setIsStudentModalOpen(true);
+    setLoadingStudents(true);
+    setStudentError('');
+    setClassStudents([]);
+    
+    try {
+      const { data } = await api.get(`/enrollments/class/${cls._id}/students`);
+      setClassStudents(data.students || []);
+    } catch (err) {
+      setStudentError(err.response?.data?.message || err.message);
+    } finally {
+      setLoadingStudents(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -283,7 +306,7 @@ export default function Class() {
                     <th className="pb-3 font-medium">Sĩ số (Max)</th>
                     <th className="pb-3 font-medium">Khai giảng</th>
                     <th className="pb-3 font-medium">Trạng thái</th>
-                    {user?.role === 'admin' && (
+                    {(user?.role === 'admin' || user?.role === 'teacher') && (
                       <th className="pb-3 font-medium text-right">Hành động</th>
                     )}
                   </tr>
@@ -315,15 +338,24 @@ export default function Class() {
                             {cls.status}
                           </span>
                         </td>
-                        {user?.role === 'admin' && (
+                        {(user?.role === 'admin' || user?.role === 'teacher') && (
                           <td className="py-4 text-right">
                             <button
-                              onClick={() => handleEdit(cls)}
-                              className="p-2 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors inline-flex"
-                              title="Sửa thông tin"
+                              onClick={() => handleViewStudents(cls)}
+                              className="p-2 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors inline-flex mr-2"
+                              title="Xem danh sách học sinh"
                             >
-                              <PencilSimple size={16} />
+                              <Users size={16} />
                             </button>
+                            {user?.role === 'admin' && (
+                              <button
+                                onClick={() => handleEdit(cls)}
+                                className="p-2 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors inline-flex"
+                                title="Sửa thông tin"
+                              >
+                                <PencilSimple size={16} />
+                              </button>
+                            )}
                           </td>
                         )}
                       </tr>
@@ -591,6 +623,81 @@ export default function Class() {
               </form>
             </>
           )}
+        </div>
+      )}
+
+      {/* Student List Modal */}
+      {isStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#121314] border border-gray-800 rounded-[12px] p-6 w-full max-w-4xl max-h-[85vh] flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-2xl text-white" style={{ fontWeight: 300 }}>Danh sách Học sinh</h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  Lớp: <span className="text-ps-blue font-medium">{selectedClassForStudents?.classCode}</span>
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsStudentModalOpen(false)}
+                className="p-2 bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              {loadingStudents ? (
+                <div className="text-center py-10 text-gray-500">Đang tải danh sách...</div>
+              ) : studentError ? (
+                <div className="text-center py-10 text-[#c81b3a] bg-[#c81b3a]/10 rounded border border-[#c81b3a]/20">
+                  {studentError}
+                </div>
+              ) : classStudents.length === 0 ? (
+                <div className="text-center py-10 text-gray-500 bg-black/50 rounded border border-gray-800/50">
+                  Lớp này chưa có học sinh nào.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-800 text-gray-400">
+                        <th className="pb-3 font-medium">Họ tên</th>
+                        <th className="pb-3 font-medium">Số điện thoại</th>
+                        <th className="pb-3 font-medium">Ngày vào học</th>
+                        <th className="pb-3 font-medium">Trạng thái</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {classStudents.map((student, index) => (
+                        <tr key={student._id || index} className="border-b border-gray-800/50 hover:bg-gray-800/20">
+                          <td className="py-4 text-white font-medium">
+                            {student.studentId?.userId?.fullName || 'Không rõ'}
+                          </td>
+                          <td className="py-4 text-gray-300">
+                            {student.studentId?.userId?.phone || '-'}
+                          </td>
+                          <td className="py-4 text-gray-400">
+                            {student.enrollDate ? new Date(student.enrollDate).toLocaleDateString('vi-VN') : '-'}
+                          </td>
+                          <td className="py-4">
+                            <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
+                              student.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 
+                              student.status === 'completed' ? 'bg-blue-500/10 text-blue-500' :
+                              'bg-gray-800 text-gray-400'
+                            }`}>
+                              {student.status === 'active' ? 'Đang học' : 
+                               student.status === 'completed' ? 'Hoàn thành' : 
+                               student.status === 'dropped' ? 'Đã nghỉ' : student.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
