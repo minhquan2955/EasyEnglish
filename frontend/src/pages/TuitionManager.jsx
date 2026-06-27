@@ -291,7 +291,20 @@ export default function TuitionManager() {
                               studentPhone={item.student.phone}
                               parents={item.student.parents || []}
                               emergencyContact={item.student.emergencyContact}
-                              messageTemplate={`Chào bạn, trung tâm EasyEnglish xin nhắc lịch đóng học phí khóa ${item.class.courseName} (Lớp ${item.class.classCode}), số tiền còn lại: ${formatCurrency(Math.max(0, item.remaining))}. Vui lòng thanh toán sớm. Xin cảm ơn!`}
+                              templates={[
+                                {
+                                  label: "Nhắc nợ học phí",
+                                  content: `Chào bạn, trung tâm EasyEnglish xin nhắc lịch đóng học phí khóa ${item.class.courseName} (Lớp ${item.class.classCode}), số tiền còn lại: ${formatCurrency(Math.max(0, item.remaining))}. Vui lòng thanh toán sớm. Xin cảm ơn!`,
+                                },
+                                {
+                                  label: "Xác nhận đã thu đủ",
+                                  content: `Chào bạn, trung tâm EasyEnglish xác nhận học sinh ${item.student.fullName} đã hoàn thành toàn bộ học phí khóa ${item.class.courseName} (Lớp ${item.class.classCode}). Xin cảm ơn!`,
+                                },
+                                {
+                                  label: "Gửi biên lai mới nhất",
+                                  content: `Chào bạn, trung tâm EasyEnglish gửi thông tin biên lai mới nhất cho học sinh ${item.student.fullName} khóa ${item.class.courseName}. Vui lòng kiểm tra trên hệ thống hoặc liên hệ trung tâm.`,
+                                }
+                              ]}
                             />
                             <button
                               onClick={() => openHistoryModal(item)}

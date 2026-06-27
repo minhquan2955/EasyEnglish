@@ -422,7 +422,20 @@ export default function Attendance() {
                                 phone: p.phone || "",
                               }))}
                               emergencyContact={student.emergencyContact}
-                              messageTemplate={`Chào bạn, trung tâm EasyEnglish xin thông báo học sinh ${student.userId?.fullName || ""} đã vắng mặt buổi học ngày ${selectedSchedule ? new Date(selectedSchedule.date).toLocaleDateString("vi-VN") : ""} (Buổi ${selectedSchedule?.sessionNumber || ""}). Vui lòng liên hệ trung tâm nếu cần thêm thông tin.`}
+                              templates={[
+                                {
+                                  label: "Thông báo vắng mặt",
+                                  content: `Chào bạn, trung tâm EasyEnglish xin thông báo học sinh ${student.userId?.fullName || ""} đã vắng mặt buổi học ngày ${selectedSchedule ? new Date(selectedSchedule.date).toLocaleDateString("vi-VN") : ""} (Buổi ${selectedSchedule?.sessionNumber || ""}). Vui lòng liên hệ trung tâm nếu cần thêm thông tin.`,
+                                },
+                                {
+                                  label: "Thông báo có mặt",
+                                  content: `Chào bạn, trung tâm EasyEnglish xin thông báo học sinh ${student.userId?.fullName || ""} đã tham gia đầy đủ buổi học ngày ${selectedSchedule ? new Date(selectedSchedule.date).toLocaleDateString("vi-VN") : ""} (Buổi ${selectedSchedule?.sessionNumber || ""}).`,
+                                },
+                                {
+                                  label: "Nhắc nhở làm bài tập",
+                                  content: `Chào bạn, trung tâm EasyEnglish xin nhắc học sinh ${student.userId?.fullName || ""} hoàn thành bài tập về nhà của buổi học ngày ${selectedSchedule ? new Date(selectedSchedule.date).toLocaleDateString("vi-VN") : ""}. Xin cảm ơn!`,
+                                }
+                              ]}
                             />
                           </td>
                         </tr>
