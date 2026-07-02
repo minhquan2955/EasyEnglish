@@ -165,6 +165,16 @@ export default function Attendance() {
         students: studentsToSave,
       });
 
+      // Update absent stats right after saving
+      try {
+        const { data: statsData } = await api.get(
+          `/attendances/class/${selectedClass._id}/stats`
+        );
+        setAbsentStats(statsData.stats || {});
+      } catch (statsErr) {
+        console.error("Lỗi khi cập nhật thống kê điểm danh", statsErr);
+      }
+
       setSuccess(data.message || "Lưu điểm danh thành công!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
