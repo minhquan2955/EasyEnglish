@@ -38,12 +38,14 @@ const Dashboard = () => {
       setLoading(true);
       try {
         const { data } = await api.get(
-          `/admin/dashboard-stats?period=${period}`
+          `/admin/dashboard-stats?period=${period}`,
         );
         setStats(data);
         setError(null);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch dashboard stats");
+        setError(
+          err.response?.data?.message || "Failed to fetch dashboard stats",
+        );
       } finally {
         setLoading(false);
       }
@@ -55,7 +57,8 @@ const Dashboard = () => {
   if (user?.role !== "admin") {
     return (
       <div className="p-8 text-center text-gray-400">
-        Bạn không có quyền truy cập trang này. Chỉ Admin mới có quyền truy cập Dashboard.
+        Bạn không có quyền truy cập trang này. Chỉ Admin mới có quyền truy cập
+        Dashboard.
       </div>
     );
   }
@@ -184,7 +187,7 @@ const Dashboard = () => {
         </div>
 
         {/* Chart */}
-        <div className="h-[400px] w-full">
+        <div className="h-100 w-full">
           {loading ? (
             <div className="h-full w-full flex items-center justify-center text-gray-500">
               Đang tải dữ liệu...
