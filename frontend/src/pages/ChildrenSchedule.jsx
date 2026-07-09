@@ -135,7 +135,7 @@ export default function ChildrenSchedule() {
       </div>
 
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
@@ -144,7 +144,7 @@ export default function ChildrenSchedule() {
       {loading ? (
         <div className="text-center py-20 text-gray-400">Đang tải dữ liệu lịch học...</div>
       ) : childrenData.length === 0 ? (
-        <div className="bg-[#1a1b1e] rounded-[12px] p-12 text-center border border-gray-800">
+        <div className="bg-surface-dark-card rounded-xl p-12 text-center border border-gray-800">
           <UserCircle size={48} className="text-gray-600 mx-auto mb-4" />
           <h3 className="text-white text-lg font-medium mb-2">Chưa có hồ sơ học sinh</h3>
           <p className="text-gray-400">Tài khoản của bạn chưa được liên kết với học sinh nào. Vui lòng liên hệ trung tâm để được hỗ trợ.</p>
@@ -175,20 +175,20 @@ export default function ChildrenSchedule() {
           </div>
 
           {/* Calendar Area */}
-          <div className="bg-white rounded-[12px] overflow-hidden shadow-2xl border border-gray-200">
+          <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
             <div className="p-4 bg-[#f9fafb] border-b border-gray-200 flex flex-wrap items-center justify-between gap-4">
               <h3 className="text-[#374151] font-semibold text-lg flex items-center gap-2">
                 Thời khóa biểu - <span className="text-ps-blue">{childrenData[activeChildIndex].student.fullName}</span>
               </h3>
               <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
-                <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#0070d1]"></div> Chính</span>
+                <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-ps-blue"></div> Chính</span>
                 <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#fbbf24]"></div> Bù</span>
                 <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#10b981]"></div> Đã học</span>
                 <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#ef4444]"></div> Đã hủy</span>
               </div>
             </div>
             
-            <div className="p-4 h-[600px]">
+            <div className="p-4 h-150">
               <style>{`
                 .schedule-calendar-light .rbc-month-view,
                 .schedule-calendar-light .rbc-time-view,

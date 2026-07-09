@@ -166,7 +166,7 @@ export default function NewsAndEvents() {
               <h3 className="text-[22px] font-bold text-ink mb-3 group-hover:text-ps-blue transition-colors leading-snug">
                 {news.title}
               </h3>
-              <p className="text-[16px] text-body-light mb-6 line-clamp-3 flex-grow">
+              <p className="text-[16px] text-body-light mb-6 line-clamp-3 grow">
                 {news.summary}
               </p>
               <div className="flex justify-between items-center mt-auto border-t border-ash-light pt-4">

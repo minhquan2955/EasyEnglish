@@ -97,7 +97,7 @@ export default function Centers() {
                 {center.name}
               </h3>
               
-              <div className="space-y-4 mb-8 flex-grow text-body-light text-[16px]">
+              <div className="space-y-4 mb-8 grow text-body-light text-[16px]">
                 <div className="flex items-start gap-3">
                   <MapPin size={24} weight="light" className="text-ps-blue shrink-0 mt-0.5" />
                   <span>{center.address}</span>

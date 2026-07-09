@@ -4,9 +4,9 @@ import { UserCircle, GraduationCap, Chalkboard, ShieldCheck, Users, Heartbeat, C
 import api from '../api';
 
 const roleLabels = {
-  admin: { label: 'Quản trị viên', icon: ShieldCheck, color: 'text-[#c81b3a]' },
+  admin: { label: 'Quản trị viên', icon: ShieldCheck, color: 'text-red-600' },
   teacher: { label: 'Giáo viên', icon: Chalkboard, color: 'text-[#0070d1]' },
-  student: { label: 'Học sinh', icon: GraduationCap, color: 'text-[#00a854]' },
+  student: { label: 'Học sinh', icon: GraduationCap, color: 'text-green-500' },
   parent: { label: 'Phụ huynh', icon: Users, color: 'text-[#f5a623]' },
 };
 
@@ -46,10 +46,10 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full py-12">
-      <div className="w-full max-w-[520px]">
+      <div className="w-full max-w-130">
 
         {/* Profile Card */}
-        <div className="bg-surface-card rounded-[8px] border border-hairline-light p-8 text-center">
+        <div className="bg-surface-card rounded-lg border border-hairline-light p-8 text-center">
 
           {/* Avatar */}
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-ps-blue/10 flex items-center justify-center">
@@ -57,7 +57,7 @@ export default function Profile() {
           </div>
 
           {/* Greeting */}
-          <h1 className="font-display font-light text-[28px] tracking-[0.1px] text-ink leading-[1.25]">
+          <h1 className="font-display font-light text-[28px] tracking-[0.1px] text-ink leading-tight">
             Trang cá nhân của {user.fullName}
           </h1>
 
@@ -198,7 +198,7 @@ function TeacherProfile({ profile }) {
             {profile.specializations.map((spec, i) => (
               <span
                 key={i}
-                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-[#00a854]/10 text-[#00a854] border border-[#00a854]/20"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20"
               >
                 {spec}
               </span>

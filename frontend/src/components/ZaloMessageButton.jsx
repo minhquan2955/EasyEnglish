@@ -169,8 +169,8 @@ export default function ZaloMessageButton({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-72 bg-[#1a1b1e] border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
-          <div className="px-3 py-2 bg-[#121314] border-b border-gray-700">
+        <div className="absolute right-0 mt-2 w-72 bg-surface-dark-card border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
+          <div className="px-3 py-2 bg-surface-dark-elevated border-b border-gray-700">
             <p className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">
               Chọn người nhận Zalo
             </p>
@@ -225,7 +225,7 @@ export default function ZaloMessageButton({
                   </button>
                   
                   {isExpanded && (
-                    <div className="bg-[#121314] py-1 border-y border-gray-800/50">
+                    <div className="bg-surface-dark-elevated py-1 border-y border-gray-800/50">
                       {activeTemplates.map((t, tIdx) => {
                         const formattedText = formatMessage(t.content, c);
                         return (

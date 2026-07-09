@@ -272,7 +272,7 @@ export default function Class() {
       </div>
 
       {activeTab === 'list' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
             <div className="flex items-center gap-2">
               <Chalkboard size={24} className="text-ps-blue" />
@@ -287,7 +287,7 @@ export default function Class() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm theo mã lớp, khóa học, GV, phòng..."
-                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[280px] placeholder:text-gray-600"
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-sm text-sm focus:outline-none focus:border-ps-blue transition-colors w-70 placeholder:text-gray-600"
               />
             </div>
           </div>
@@ -332,8 +332,8 @@ export default function Class() {
                           {cls.startDate ? new Date(cls.startDate).toLocaleDateString('vi-VN') : '-'}
                         </td>
                         <td className="py-4">
-                          <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
-                            cls.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 'bg-gray-800 text-gray-400'
+                          <span className={`px-2 py-1 rounded-sm text-xs font-medium ${
+                            cls.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-gray-800 text-gray-400'
                           }`}>
                             {cls.status}
                           </span>
@@ -369,7 +369,7 @@ export default function Class() {
       )}
 
       {activeTab === 'create' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-8 max-w-3xl mx-auto">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-8 max-w-3xl mx-auto">
           <div className="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
             <div className="w-10 h-10 rounded-full bg-ps-blue/20 flex items-center justify-center">
               {editingId ? (
@@ -388,13 +388,13 @@ export default function Class() {
           ) : (
             <>
               {error && (
-                <div className="mb-6 p-4 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] rounded-[4px] text-sm">
+                <div className="mb-6 p-4 bg-red-600/10 border border-red-600/20 text-red-600 rounded-sm text-sm">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="mb-6 p-4 bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] rounded-[4px] text-sm">
+                <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-sm text-sm">
                   {success}
                 </div>
               )}
@@ -415,7 +415,7 @@ export default function Class() {
                         required
                         disabled={!!editingId}
                         placeholder="VD: ENG-2024-01"
-                        className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                     </div>
                   </div>
@@ -427,7 +427,7 @@ export default function Class() {
                       value={formData.courseId}
                       onChange={handleChange}
                       required
-                      className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
+                      className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
                     >
                       <option value="">-- Chọn khóa học --</option>
                       {courses.map(c => (
@@ -449,7 +449,7 @@ export default function Class() {
                         value={formData.teacherId}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
                       >
                         <option value="">-- Chọn giáo viên --</option>
                         {teachers.map(t => (
@@ -471,7 +471,7 @@ export default function Class() {
                         value={formData.room}
                         onChange={handleChange}
                         placeholder="VD: Room A1"
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       />
                     </div>
                   </div>
@@ -492,7 +492,7 @@ export default function Class() {
                         required
                         min="1"
                         placeholder="VD: 15"
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       />
                     </div>
                   </div>
@@ -508,7 +508,7 @@ export default function Class() {
                         name="startDate"
                         value={formData.startDate}
                         onChange={handleChange}
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                         style={{ colorScheme: 'dark' }}
                       />
                     </div>
@@ -525,7 +525,7 @@ export default function Class() {
                         name="endDate"
                         value={formData.endDate}
                         onChange={handleChange}
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                         style={{ colorScheme: 'dark' }}
                       />
                     </div>
@@ -543,7 +543,7 @@ export default function Class() {
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
                       >
                         <option value="active">Đang mở (Active)</option>
                         <option value="inactive">Tạm dừng (Inactive)</option>
@@ -553,7 +553,7 @@ export default function Class() {
                   </div>
                 )}
 
-                <div className="border border-gray-800 rounded-[8px] p-5 mt-6">
+                <div className="border border-gray-800 rounded-lg p-5 mt-6">
                   <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                     <Clock size={20} className="text-ps-blue"/> Lịch học trong tuần
                   </h3>
@@ -587,7 +587,7 @@ export default function Class() {
                         value={formData.startTime}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                         style={{ colorScheme: 'dark' }}
                       />
                     </div>
@@ -599,7 +599,7 @@ export default function Class() {
                         value={formData.endTime}
                         onChange={handleChange}
                         required
-                        className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                         style={{ colorScheme: 'dark' }}
                       />
                     </div>
@@ -610,7 +610,7 @@ export default function Class() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                    className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
                   >
                     {loading ? 'Đang xử lý...' : (
                       <>
@@ -629,7 +629,7 @@ export default function Class() {
       {/* Student List Modal */}
       {isStudentModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#121314] border border-gray-800 rounded-[12px] p-6 w-full max-w-4xl max-h-[85vh] flex flex-col">
+          <div className="bg-surface-dark-elevated border border-gray-800 rounded-xl p-6 w-full max-w-4xl max-h-[85vh] flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-2xl text-white" style={{ fontWeight: 300 }}>Danh sách Học sinh</h3>
@@ -649,7 +649,7 @@ export default function Class() {
               {loadingStudents ? (
                 <div className="text-center py-10 text-gray-500">Đang tải danh sách...</div>
               ) : studentError ? (
-                <div className="text-center py-10 text-[#c81b3a] bg-[#c81b3a]/10 rounded border border-[#c81b3a]/20">
+                <div className="text-center py-10 text-red-600 bg-red-600/10 rounded border border-red-600/20">
                   {studentError}
                 </div>
               ) : classStudents.length === 0 ? (
@@ -680,8 +680,8 @@ export default function Class() {
                             {student.enrollDate ? new Date(student.enrollDate).toLocaleDateString('vi-VN') : '-'}
                           </td>
                           <td className="py-4">
-                            <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
-                              student.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 
+                            <span className={`px-2 py-1 rounded-sm text-xs font-medium ${
+                              student.status === 'active' ? 'bg-green-500/10 text-green-500' : 
                               student.status === 'completed' ? 'bg-blue-500/10 text-blue-500' :
                               'bg-gray-800 text-gray-400'
                             }`}>

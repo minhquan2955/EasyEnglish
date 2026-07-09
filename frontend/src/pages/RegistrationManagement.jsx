@@ -166,7 +166,7 @@ export default function RegistrationManagement() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {/* Total */}
-        <div className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-4 flex items-center justify-between">
+        <div className="bg-surface-dark-card border border-gray-800 rounded-lg p-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
               Tổng số
@@ -181,7 +181,7 @@ export default function RegistrationManagement() {
         </div>
 
         {/* Pending */}
-        <div className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-4 flex items-center justify-between">
+        <div className="bg-surface-dark-card border border-gray-800 rounded-lg p-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
               Chờ liên hệ
@@ -196,7 +196,7 @@ export default function RegistrationManagement() {
         </div>
 
         {/* Contacted */}
-        <div className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-4 flex items-center justify-between">
+        <div className="bg-surface-dark-card border border-gray-800 rounded-lg p-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
               Đã liên hệ
@@ -211,7 +211,7 @@ export default function RegistrationManagement() {
         </div>
 
         {/* Completed */}
-        <div className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-4 flex items-center justify-between">
+        <div className="bg-surface-dark-card border border-gray-800 rounded-lg p-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
               Hoàn thành
@@ -226,7 +226,7 @@ export default function RegistrationManagement() {
         </div>
 
         {/* Rejected */}
-        <div className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-4 flex items-center justify-between col-span-2 md:col-span-1">
+        <div className="bg-surface-dark-card border border-gray-800 rounded-lg p-4 flex items-center justify-between col-span-2 md:col-span-1">
           <div>
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
               Từ chối
@@ -243,20 +243,20 @@ export default function RegistrationManagement() {
 
       {/* Notifications */}
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
       )}
       {success && (
-        <div className="bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-3 rounded-lg flex items-center gap-2">
           <CheckCircle size={20} />
           <p className="text-sm">{success}</p>
         </div>
       )}
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1a1b1e] border border-gray-800 p-4 rounded-[8px]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-dark-card border border-gray-800 p-4 rounded-lg">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <MagnifyingGlass
@@ -268,12 +268,12 @@ export default function RegistrationManagement() {
             placeholder="Tìm theo tên PH, tên học sinh, SĐT..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-11 pl-10 pr-4 bg-black border border-gray-800 rounded-[6px] text-white focus:outline-none focus:border-ps-blue transition-colors text-sm"
+            className="w-full h-11 pl-10 pr-4 bg-black border border-gray-800 rounded-md text-white focus:outline-none focus:border-ps-blue transition-colors text-sm"
           />
         </div>
 
         {/* Status Tab Filters */}
-        <div className="flex flex-wrap gap-1.5 bg-black/40 p-1 rounded-[6px] border border-gray-800/40">
+        <div className="flex flex-wrap gap-1.5 bg-black/40 p-1 rounded-md border border-gray-800/40">
           {[
             { id: "all", label: "Tất cả" },
             { id: "pending", label: "Chờ liên hệ" },
@@ -284,7 +284,7 @@ export default function RegistrationManagement() {
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-4 py-2 rounded-[4px] text-xs font-medium transition-all ${
+              className={`px-4 py-2 rounded-sm text-xs font-medium transition-all ${
                 statusFilter === tab.id
                   ? "bg-ps-blue text-white shadow-md"
                   : "text-gray-400 hover:text-white hover:bg-gray-800/40"
@@ -298,12 +298,12 @@ export default function RegistrationManagement() {
 
       {/* Table Container */}
       {loading ? (
-        <div className="text-center py-20 text-gray-400 bg-[#1a1b1e] border border-gray-800 rounded-[8px]">
+        <div className="text-center py-20 text-gray-400 bg-surface-dark-card border border-gray-800 rounded-lg">
           Đang tải danh sách đăng ký tư vấn...
         </div>
       ) : (
-        <div className="bg-[#1a1b1e] rounded-[8px] border border-gray-800 overflow-hidden shadow-lg">
-          <div className="p-4 bg-[#121314] border-b border-gray-800 flex justify-between items-center">
+        <div className="bg-surface-dark-card rounded-lg border border-gray-800 overflow-hidden shadow-lg">
+          <div className="p-4 bg-surface-dark-elevated border-b border-gray-800 flex justify-between items-center">
             <h3 className="text-white font-medium text-sm">
               Kết quả hiển thị:{" "}
               <span className="text-ps-blue font-bold">
@@ -315,7 +315,7 @@ export default function RegistrationManagement() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
-              <thead className="bg-[#121314] text-gray-400 border-b border-gray-800 text-xs uppercase tracking-wider">
+              <thead className="bg-surface-dark-elevated text-gray-400 border-b border-gray-800 text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-4 font-medium w-12 text-center">
                     STT
@@ -435,7 +435,7 @@ export default function RegistrationManagement() {
                             onChange={(e) =>
                               handleStatusChange(reg._id, e.target.value)
                             }
-                            className="bg-black border border-gray-800 text-xs rounded-[6px] h-9 px-2 focus:outline-none focus:border-ps-blue text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:border-gray-700"
+                            className="bg-black border border-gray-800 text-xs rounded-md h-9 px-2 focus:outline-none focus:border-ps-blue text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:border-gray-700"
                           >
                             <option value="pending">Chờ liên hệ</option>
                             <option value="contacted">Đã liên hệ</option>

@@ -178,19 +178,19 @@ export default function TuitionManager() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <p className="text-gray-400 text-sm mb-1">Tổng học phí</p>
           <p className="text-2xl text-white" style={{ fontWeight: 300 }}>
             {formatCurrency(totalFee)}
           </p>
         </div>
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <p className="text-gray-400 text-sm mb-1">Đã thu</p>
           <p className="text-2xl text-green-400" style={{ fontWeight: 300 }}>
             {formatCurrency(totalPaid)}
           </p>
         </div>
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <p className="text-gray-400 text-sm mb-1">Còn nợ</p>
           <p className="text-2xl text-red-400" style={{ fontWeight: 300 }}>
             {formatCurrency(totalRemaining)}
@@ -199,7 +199,7 @@ export default function TuitionManager() {
       </div>
 
       {/* Tuition Table */}
-      <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+      <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
           <div className="flex items-center gap-2">
             <Money size={24} className="text-ps-blue" />
@@ -216,7 +216,7 @@ export default function TuitionManager() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên, mã HS, mã lớp..."
-              className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[280px] placeholder:text-gray-600"
+              className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-sm text-sm focus:outline-none focus:border-ps-blue transition-colors w-70 placeholder:text-gray-600"
             />
           </div>
         </div>
@@ -337,7 +337,7 @@ export default function TuitionManager() {
       {/* Pay Modal */}
       {showPayModal && selectedItem && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-[#1a1b1c] border border-gray-700 rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="bg-surface-dark-card border border-gray-700 rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-medium">Thu học phí</h3>
               <button
@@ -390,7 +390,7 @@ export default function TuitionManager() {
                   }
                   required
                   min="1"
-                  className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors"
+                  className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors"
                   placeholder="Nhập số tiền"
                 />
               </div>
@@ -403,7 +403,7 @@ export default function TuitionManager() {
                   onChange={(e) =>
                     setPayForm({ ...payForm, method: e.target.value })
                   }
-                  className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors appearance-none"
+                  className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors appearance-none"
                 >
                   <option value="cash">Tiền mặt</option>
                   <option value="transfer">Chuyển khoản</option>
@@ -422,7 +422,7 @@ export default function TuitionManager() {
                       receiptNumber: e.target.value,
                     })
                   }
-                  className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors"
+                  className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors"
                   placeholder="VD: BL-001"
                 />
               </div>
@@ -435,7 +435,7 @@ export default function TuitionManager() {
                   onChange={(e) =>
                     setPayForm({ ...payForm, notes: e.target.value })
                   }
-                  className="w-full px-4 py-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors resize-none"
                   rows={2}
                   placeholder="Ghi chú thêm..."
                 />
@@ -443,7 +443,7 @@ export default function TuitionManager() {
               <button
                 type="submit"
                 disabled={paying}
-                className="w-full h-12 bg-ps-blue text-white rounded-[4px] font-medium hover:bg-ps-blue/80 transition-colors disabled:opacity-50"
+                className="w-full h-12 bg-ps-blue text-white rounded-sm font-medium hover:bg-ps-blue/80 transition-colors disabled:opacity-50"
               >
                 {paying ? "Đang xử lý..." : "Xác nhận thu tiền"}
               </button>
@@ -455,7 +455,7 @@ export default function TuitionManager() {
       {/* History Modal */}
       {showHistoryModal && historyItem && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-[#1a1b1c] border border-gray-700 rounded-lg p-6 w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto">
+          <div className="bg-surface-dark-card border border-gray-700 rounded-lg p-6 w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-medium">Lịch sử thanh toán</h3>
               <button

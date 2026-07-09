@@ -13,7 +13,7 @@ export default function Hero() {
           <div className="w-full lg:w-5/12">
             <h1 className="display-xl mb-6">Khai mở tiềm năng Tiếng Anh.</h1>
 
-            <p className="text-[18px] text-body-light mb-10 leading-relaxed max-w-[520px]">
+            <p className="text-[18px] text-body-light mb-10 leading-relaxed max-w-130">
               Môi trường học tập tiêu chuẩn quốc tế giúp học viên tự tin giao
               tiếp, phát triển tư duy toàn diện và sẵn sàng chinh phục mọi thử
               thách trong tương lai.

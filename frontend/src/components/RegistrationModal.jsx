@@ -117,7 +117,7 @@ export default function RegistrationModal({
           /* Form View */
           <form onSubmit={handleSubmit} className="p-6">
             {error && (
-              <div className="mb-5 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[4px] text-sm">
+              <div className="mb-5 bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-sm text-sm">
                 {error}
               </div>
             )}
@@ -133,7 +133,7 @@ export default function RegistrationModal({
                   required
                   value={formData.parentName}
                   onChange={handleChange}
-                  className="w-full h-[48px] px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
+                  className="w-full h-12 px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
                   placeholder="Nhập họ và tên"
                 />
               </div>
@@ -149,7 +149,7 @@ export default function RegistrationModal({
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full h-[48px] px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
+                  className="w-full h-12 px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
                   placeholder="Ví dụ: 0912345678"
                 />
               </div>
@@ -164,7 +164,7 @@ export default function RegistrationModal({
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full h-[48px] px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
+                  className="w-full h-12 px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
                   placeholder="Email liên hệ (không bắt buộc)"
                 />
               </div>
@@ -180,7 +180,7 @@ export default function RegistrationModal({
                   required
                   value={formData.childName}
                   onChange={handleChange}
-                  className="w-full h-[48px] px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
+                  className="w-full h-12 px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
                   placeholder="Nhập tên bé"
                 />
               </div>
@@ -197,7 +197,7 @@ export default function RegistrationModal({
                   max="18"
                   value={formData.childAge}
                   onChange={handleChange}
-                  className="w-full h-[48px] px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
+                  className="w-full h-12 px-4 bg-canvas-light text-ink border border-ash-light rounded-sm focus:outline-none focus:border-ps-blue focus:border-2 transition-all text-[16px]"
                   placeholder="Ví dụ: 7"
                 />
               </div>

@@ -110,7 +110,7 @@ const Dashboard = () => {
           title="Tổng Học Sinh"
           value={loading ? "..." : stats.totals.students}
           icon={Users}
-          colorClass="bg-[#0070d1]"
+          colorClass="bg-ps-blue"
         />
         <StatCard
           title="Tổng Giáo Viên"
@@ -260,7 +260,7 @@ const Dashboard = () => {
           Doanh thu học phí
         </h2>
 
-        <div className="h-[350px] w-full">
+        <div className="h-87.5 w-full">
           {loading ? (
             <div className="h-full w-full flex items-center justify-center text-gray-500">
               Đang tải dữ liệu...

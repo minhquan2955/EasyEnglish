@@ -81,28 +81,28 @@ export default function Login() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 bg-canvas-light">
-      <div className="w-full max-w-[420px]">
+      <div className="w-full max-w-105">
         {/* Form Card */}
-        <div className="bg-surface-card rounded-[8px] border border-hairline-light p-8">
+        <div className="bg-surface-card rounded-lg border border-hairline-light p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
-              <span className="font-display font-light text-[28px] tracking-[0.1px] text-ink leading-[1.25]">
+              <span className="font-display font-light text-[28px] tracking-[0.1px] text-ink leading-tight">
                 EasyEnglish
               </span>
             </Link>
-            <h1 className="font-display font-light text-[28px] tracking-[0.1px] text-ink leading-[1.25]">
+            <h1 className="font-display font-light text-[28px] tracking-[0.1px] text-ink leading-tight">
               Đăng nhập My EasyEnglish
             </h1>
-            <p className="mt-3 text-[16px] text-body-light leading-[1.5]">
+            <p className="mt-3 text-[16px] text-body-light leading-normal">
               Nhập thông tin tài khoản để tiếp tục
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 flex items-start gap-2 px-4 py-3 rounded-[4px] bg-[#c81b3a]/10">
-              <span className="text-[14px] text-[#c81b3a] leading-[1.5]">
+            <div className="mb-6 flex items-start gap-2 px-4 py-3 rounded-sm bg-red-600/10">
+              <span className="text-[14px] text-red-600 leading-normal">
                 {error}
               </span>
             </div>
@@ -137,7 +137,7 @@ export default function Login() {
                   }}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="w-full h-[48px] pl-11 pr-4 bg-canvas-light text-ink text-[18px] leading-[1.5] tracking-[0.1px] rounded-[4px] border border-ash-light outline-none transition-[border-color] duration-200 placeholder:text-ash-light focus:border-2 focus:border-ps-blue focus:pl-[calc(2.75rem-1px)] focus:pr-[calc(1rem-1px)]"
+                  className="w-full h-12 pl-11 pr-4 bg-canvas-light text-ink text-[18px] leading-normal tracking-[0.1px] rounded-sm border border-ash-light outline-none transition-[border-color] duration-200 placeholder:text-ash-light focus:border-2 focus:border-ps-blue focus:pl-10.75 focus:pr-3.75"
                 />
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function Login() {
                   }}
                   placeholder="Nhập mật khẩu"
                   autoComplete="current-password"
-                  className="w-full h-[48px] pl-11 pr-12 bg-canvas-light text-ink text-[18px] leading-[1.5] tracking-[0.1px] rounded-[4px] border border-ash-light outline-none transition-[border-color] duration-200 placeholder:text-ash-light focus:border-2 focus:border-ps-blue focus:pl-[calc(2.75rem-1px)] focus:pr-[calc(3rem-1px)]"
+                  className="w-full h-12 pl-11 pr-12 bg-canvas-light text-ink text-[18px] leading-normal tracking-[0.1px] rounded-sm border border-ash-light outline-none transition-[border-color] duration-200 placeholder:text-ash-light focus:border-2 focus:border-ps-blue focus:pl-10.75 focus:pr-11.75"
                 />
                 <button
                   type="button"
@@ -184,7 +184,7 @@ export default function Login() {
               id="login-submit"
               type="submit"
               disabled={loading}
-              className="w-full h-[48px] flex items-center justify-center gap-2 bg-ps-blue text-on-dark text-[18px] font-bold leading-[1.25] tracking-[0.45px] rounded-full transition-colors hover:bg-ps-blue-pressed active:bg-ps-blue-active disabled:bg-surface-soft disabled:text-ash-light disabled:cursor-not-allowed"
+              className="w-full h-12 flex items-center justify-center gap-2 bg-ps-blue text-on-dark text-[18px] font-bold leading-tight tracking-[0.45px] rounded-full transition-colors hover:bg-ps-blue-pressed active:bg-ps-blue-active disabled:bg-surface-soft disabled:text-ash-light disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -199,10 +199,10 @@ export default function Login() {
         </div>
 
         {/* Footer note */}
-        <p className="mt-6 text-center text-[14px] text-body-light leading-[1.5]">
+        <p className="mt-6 text-center text-[14px] text-body-light leading-normal">
           Tài khoản được cung cấp bởi quản trị viên EasyEnglish.
           <br />
-          <Link to="/" className="text-[#0064b7] hover:underline">
+          <Link to="/" className="text-ps-blue-pressed hover:underline">
             Quay về trang chủ
           </Link>
         </p>

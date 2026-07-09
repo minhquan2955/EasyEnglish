@@ -285,7 +285,7 @@ export default function Schedule() {
 
       {/* Tab 1: Summary List */}
       {activeTab === "list" && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <ListBullets size={24} className="text-ps-blue" />
@@ -297,7 +297,7 @@ export default function Schedule() {
 
           {genMsg && (
             <div
-              className={`mb-4 p-4 rounded-[4px] text-sm ${genMsg.startsWith("Error:") ? "bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a]" : "bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854]"}`}
+              className={`mb-4 p-4 rounded-sm text-sm ${genMsg.startsWith("Error:") ? "bg-red-600/10 border border-red-600/20 text-red-600" : "bg-green-500/10 border border-green-500/20 text-green-500"}`}
             >
               {genMsg}
             </div>
@@ -361,12 +361,12 @@ export default function Schedule() {
                             </span>
                           </td>
                           <td className="py-4">
-                            <span className="text-[#00a854] font-medium">
+                            <span className="text-green-500 font-medium">
                               {s.completed}
                             </span>
                           </td>
                           <td className="py-4">
-                            <span className="text-[#c81b3a] font-medium">
+                            <span className="text-red-600 font-medium">
                               {s.cancelled}
                             </span>
                           </td>
@@ -385,7 +385,7 @@ export default function Schedule() {
                           <td className="py-4 text-right">
                             <button
                               onClick={() => setDeleteConfirmClass({ id: s.classId, code: s.classCode })}
-                              className="p-2 text-gray-500 hover:text-[#c81b3a] hover:bg-[#c81b3a]/10 rounded transition-colors"
+                              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-600/10 rounded transition-colors"
                               title="Xóa toàn bộ lịch học của lớp này"
                             >
                               <Trash size={18} />
@@ -399,7 +399,7 @@ export default function Schedule() {
               </div>
 
               {/* Generate section */}
-              <div className="mt-8 p-6 bg-black border border-gray-800 rounded-[8px]">
+              <div className="mt-8 p-6 bg-black border border-gray-800 rounded-lg">
                 <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                   <Lightning size={20} className="text-ps-blue" />
                   Tạo lịch hàng loạt cho lớp
@@ -410,13 +410,13 @@ export default function Schedule() {
                   lớp.
                 </p>
                 <div className="flex gap-3 items-end flex-wrap">
-                  <div className="flex-1 min-w-[200px]">
+                  <div className="flex-1 min-w-50">
                     <label className="block text-sm text-gray-300 mb-1">
                       Chọn lớp
                     </label>
                     <select
                       id="generate-class-select"
-                      className="w-full h-12 px-4 bg-[#121314] border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
+                      className="w-full h-12 px-4 bg-surface-dark-elevated border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
                       defaultValue=""
                       onChange={(e) => {
                         /* just for form */
@@ -440,7 +440,7 @@ export default function Schedule() {
                       );
                       if (select.value) handleGenerate(select.value);
                     }}
-                    className="h-12 px-6 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center gap-2 whitespace-nowrap"
+                    className="h-12 px-6 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors disabled:opacity-70 flex items-center gap-2 whitespace-nowrap"
                   >
                     <Plus size={18} weight="bold" />
                     {generating ? "Đang tạo..." : "Tạo lịch"}
@@ -456,7 +456,7 @@ export default function Schedule() {
       {activeTab === "calendar" && (
         <div className="space-y-6">
           {/* Class selector */}
-          <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+          <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <CalendarBlank size={24} className="text-ps-blue" />
@@ -464,11 +464,11 @@ export default function Schedule() {
                   Lịch tuần
                 </h2>
               </div>
-              <div className="flex-1 min-w-[200px] max-w-xs">
+              <div className="flex-1 min-w-50 max-w-xs">
                 <select
                   value={selectedClassId}
                   onChange={(e) => setSelectedClassId(e.target.value)}
-                  className="w-full h-10 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none text-sm"
+                  className="w-full h-10 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none text-sm"
                 >
                   <option value="">-- Chọn lớp để xem lịch --</option>
                   {classes.map((c) => (
@@ -495,13 +495,13 @@ export default function Schedule() {
           </div>
 
           {/* Calendar */}
-          <div className="rounded-[8px] border border-gray-800 overflow-hidden">
+          <div className="rounded-lg border border-gray-800 overflow-hidden">
             {loadingCal ? (
-              <div className="text-center py-20 text-gray-500 bg-[#121314]">
+              <div className="text-center py-20 text-gray-500 bg-surface-dark-elevated">
                 Đang tải lịch...
               </div>
             ) : !selectedClassId ? (
-              <div className="text-center py-20 text-gray-500 bg-[#121314]">
+              <div className="text-center py-20 text-gray-500 bg-surface-dark-elevated">
                 Hãy chọn một lớp ở trên để xem lịch tuần.
               </div>
             ) : (
@@ -546,7 +546,7 @@ export default function Schedule() {
           onClick={() => setEditingSession(null)}
         >
           <div
-            className="bg-[#1a1b1e] rounded-[12px] border border-gray-700 p-8 w-full max-w-lg"
+            className="bg-surface-dark-card rounded-xl border border-gray-700 p-8 w-full max-w-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -574,12 +574,12 @@ export default function Schedule() {
             </p>
 
             {editError && (
-              <div className="mb-4 p-3 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] rounded-[4px] text-sm">
+              <div className="mb-4 p-3 bg-red-600/10 border border-red-600/20 text-red-600 rounded-sm text-sm">
                 {editError}
               </div>
             )}
             {editSuccess && (
-              <div className="mb-4 p-3 bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] rounded-[4px] text-sm">
+              <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 text-green-500 rounded-sm text-sm">
                 {editSuccess}
               </div>
             )}
@@ -597,7 +597,7 @@ export default function Schedule() {
                     onChange={(e) =>
                       setEditForm((p) => ({ ...p, startTime: e.target.value }))
                     }
-                    className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                    className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                     style={{ colorScheme: "dark" }}
                   />
                 </div>
@@ -612,7 +612,7 @@ export default function Schedule() {
                     onChange={(e) =>
                       setEditForm((p) => ({ ...p, endTime: e.target.value }))
                     }
-                    className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                    className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                     style={{ colorScheme: "dark" }}
                   />
                 </div>
@@ -629,7 +629,7 @@ export default function Schedule() {
                   onChange={(e) =>
                     setEditForm((p) => ({ ...p, room: e.target.value }))
                   }
-                  className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                  className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                   placeholder="VD: P.201"
                 />
               </div>
@@ -645,7 +645,7 @@ export default function Schedule() {
                   onChange={(e) =>
                     setEditForm((p) => ({ ...p, topic: e.target.value }))
                   }
-                  className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                  className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                   placeholder="VD: Unit 1 - Greetings"
                 />
               </div>
@@ -663,7 +663,7 @@ export default function Schedule() {
                       onClick={() =>
                         setEditForm((p) => ({ ...p, status: key }))
                       }
-                      className="py-2 text-xs font-medium rounded-[4px] border-2 transition-all"
+                      className="py-2 text-xs font-medium rounded-sm border-2 transition-all"
                       style={{
                         backgroundColor:
                           editForm.status === key ? val.bg : "transparent",
@@ -681,7 +681,7 @@ export default function Schedule() {
                 <button
                   type="submit"
                   disabled={editLoading}
-                  className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                   {editLoading ? (
                     "Đang lưu..."
@@ -704,10 +704,10 @@ export default function Schedule() {
           onClick={() => setDeleteConfirmClass(null)}
         >
           <div
-            className="bg-[#1a1b1e] rounded-[12px] border border-gray-700 p-8 w-full max-w-md text-center"
+            className="bg-surface-dark-card rounded-xl border border-gray-700 p-8 w-full max-w-md text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto w-12 h-12 bg-[#c81b3a]/10 rounded-full flex items-center justify-center mb-4 text-[#c81b3a]">
+            <div className="mx-auto w-12 h-12 bg-red-600/10 rounded-full flex items-center justify-center mb-4 text-red-600">
               <Trash size={24} />
             </div>
             <h3 className="text-xl text-white mb-2" style={{ fontWeight: 400 }}>
@@ -732,7 +732,7 @@ export default function Schedule() {
               <button
                 onClick={() => handleDeleteSchedules(deleteConfirmClass.id)}
                 disabled={deleteLoading}
-                className="px-6 py-2 rounded-full bg-[#c81b3a] text-white hover:bg-[#a6152e] transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-70"
+                className="px-6 py-2 rounded-full bg-red-600 text-white hover:bg-[#a6152e] transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-70"
               >
                 {deleteLoading ? "Đang xóa..." : "Xóa lịch học"}
               </button>

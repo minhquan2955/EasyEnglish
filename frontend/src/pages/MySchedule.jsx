@@ -129,18 +129,18 @@ export default function MySchedule() {
       </div>
 
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
       )}
 
       {/* Calendar Area */}
-      <div className="bg-white rounded-[12px] overflow-hidden shadow-2xl border border-gray-200">
+      <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
         <div className="p-4 bg-[#f9fafb] border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-[#374151] font-semibold text-lg">Thời khóa biểu</h3>
           <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
-            <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#0070d1]"></div> Lịch học chính</span>
+            <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-ps-blue"></div> Lịch học chính</span>
             <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#fbbf24]"></div> Lịch học bù</span>
             <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#10b981]"></div> Đã học</span>
             <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#ef4444]"></div> Đã hủy</span>
@@ -148,11 +148,11 @@ export default function MySchedule() {
         </div>
         
         {loading ? (
-          <div className="h-[600px] flex items-center justify-center text-gray-500">
+          <div className="h-150 flex items-center justify-center text-gray-500">
             Đang tải lịch học...
           </div>
         ) : (
-          <div className="p-4 h-[600px]">
+          <div className="p-4 h-150">
             <style>{`
               .schedule-calendar-light .rbc-month-view,
               .schedule-calendar-light .rbc-time-view,

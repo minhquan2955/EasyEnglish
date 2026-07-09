@@ -150,7 +150,7 @@ export default function ParentsCorner() {
                   <h3 className="text-[18px] font-bold text-ink mb-3 uppercase group-hover:text-ps-blue transition-colors leading-snug">
                     {post.title}
                   </h3>
-                  <p className="text-[14px] text-body-light flex-grow">
+                  <p className="text-[14px] text-body-light grow">
                     {post.summary}
                   </p>
                 </div>

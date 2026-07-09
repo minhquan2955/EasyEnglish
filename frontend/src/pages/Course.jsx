@@ -187,7 +187,7 @@ export default function Course() {
       </div>
 
       {activeTab === 'list' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
             <div className="flex items-center gap-2">
               <Books size={24} className="text-ps-blue" />
@@ -202,7 +202,7 @@ export default function Course() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm theo mã, tên khóa học..."
-                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[260px] placeholder:text-gray-600"
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-sm text-sm focus:outline-none focus:border-ps-blue transition-colors w-65 placeholder:text-gray-600"
               />
             </div>
           </div>
@@ -241,8 +241,8 @@ export default function Course() {
                           {course.tuitionFee?.toLocaleString()} đ
                         </td>
                         <td className="py-4">
-                          <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
-                            course.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 'bg-gray-800 text-gray-400'
+                          <span className={`px-2 py-1 rounded-sm text-xs font-medium ${
+                            course.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-gray-800 text-gray-400'
                           }`}>
                             {course.status}
                           </span>
@@ -267,7 +267,7 @@ export default function Course() {
       )}
 
       {activeTab === 'create' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-8 max-w-2xl mx-auto">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-8 max-w-2xl mx-auto">
           <div className="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
             <div className="w-10 h-10 rounded-full bg-ps-blue/20 flex items-center justify-center">
               {editingId ? (
@@ -282,13 +282,13 @@ export default function Course() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] rounded-[4px] text-sm">
+            <div className="mb-6 p-4 bg-red-600/10 border border-red-600/20 text-red-600 rounded-sm text-sm">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-6 p-4 bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] rounded-[4px] text-sm">
+            <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-sm text-sm">
               {success}
             </div>
           )}
@@ -309,7 +309,7 @@ export default function Course() {
                     required
                     disabled={!!editingId}
                     placeholder="VD: IELTS-ADV"
-                    className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>
@@ -324,7 +324,7 @@ export default function Course() {
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
+                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
                   >
                     <option value="ielts">IELTS</option>
                     <option value="nursery">Mẫu giáo</option>
@@ -348,7 +348,7 @@ export default function Course() {
                   onChange={handleChange}
                   required
                   placeholder="Nhập tên khóa học..."
-                  className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                  className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                 />
               </div>
             </div>
@@ -368,7 +368,7 @@ export default function Course() {
                     required
                     min="1"
                     placeholder="VD: 24"
-                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                   />
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function Course() {
                     required
                     min="1"
                     placeholder="VD: 90"
-                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                   />
                 </div>
               </div>
@@ -406,7 +406,7 @@ export default function Course() {
                     required
                     min="0"
                     placeholder="VD: 5000000"
-                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                   />
                 </div>
               </div>
@@ -424,7 +424,7 @@ export default function Course() {
                   value={formData.curriculum}
                   onChange={handleChange}
                   placeholder="Tên sách hoặc tài liệu sử dụng..."
-                  className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                  className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                 />
               </div>
             </div>
@@ -440,7 +440,7 @@ export default function Course() {
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
+                    className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none"
                   >
                     <option value="active">Hoạt động (Active)</option>
                     <option value="inactive">Đã khóa (Inactive)</option>
@@ -453,7 +453,7 @@ export default function Course() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {loading ? 'Đang xử lý...' : (
                   <>

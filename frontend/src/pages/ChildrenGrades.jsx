@@ -68,7 +68,7 @@ export default function ChildrenGrades() {
       </div>
 
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
@@ -77,7 +77,7 @@ export default function ChildrenGrades() {
       {loading ? (
         <div className="text-center py-20 text-gray-400">Đang tải dữ liệu điểm số...</div>
       ) : childrenData.length === 0 ? (
-        <div className="bg-[#1a1b1e] rounded-[12px] p-12 text-center border border-gray-800">
+        <div className="bg-surface-dark-card rounded-xl p-12 text-center border border-gray-800">
           <UserCircle size={48} className="text-gray-600 mx-auto mb-4" />
           <h3 className="text-white text-lg font-medium mb-2">Chưa có hồ sơ học sinh</h3>
           <p className="text-gray-400">Tài khoản của bạn chưa được liên kết với học sinh nào. Vui lòng liên hệ trung tâm để được hỗ trợ.</p>
@@ -107,9 +107,9 @@ export default function ChildrenGrades() {
             ))}
           </div>
 
-          <div className="bg-[#1a1b1e] rounded-[12px] overflow-hidden shadow-2xl border border-gray-800">
+          <div className="bg-surface-dark-card rounded-xl overflow-hidden shadow-2xl border border-gray-800">
             {/* Class Header */}
-            <div className="p-6 bg-[#121314] border-b border-gray-800 flex items-center justify-between gap-4 flex-wrap">
+            <div className="p-6 bg-surface-dark-elevated border-b border-gray-800 flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-ps-blue/10 flex items-center justify-center text-ps-blue shrink-0">
                   <GraduationCap size={28} weight="fill" />
@@ -130,7 +130,7 @@ export default function ChildrenGrades() {
                   </p>
                 </div>
               </div>
-              <div className="bg-[#1a1b1e] border border-gray-800 px-4 py-2 rounded-[8px]">
+              <div className="bg-surface-dark-card border border-gray-800 px-4 py-2 rounded-lg">
                 <span className="text-sm text-gray-400">Học sinh:</span>
                 <span className="ml-2 font-medium text-white">{activeChild.student.fullName}</span>
                 <span className="ml-2 text-xs text-gray-500">({activeChild.student.studentCode})</span>
@@ -140,7 +140,7 @@ export default function ChildrenGrades() {
             {/* Grades Table */}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#1a1b1e] text-gray-400 border-b border-gray-800">
+                <thead className="bg-surface-dark-card text-gray-400 border-b border-gray-800">
                   <tr>
                     <th className="px-6 py-4 font-medium">Tên bài kiểm tra</th>
                     <th className="px-6 py-4 font-medium">Loại bài</th>

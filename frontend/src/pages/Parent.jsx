@@ -184,7 +184,7 @@ export default function Parent() {
       </div>
 
       {activeTab === 'list' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
             <div className="flex items-center gap-2">
               <UsersThree size={24} className="text-ps-blue" />
@@ -199,7 +199,7 @@ export default function Parent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm theo tên, email, SĐT..."
-                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[260px] placeholder:text-gray-600"
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-sm text-sm focus:outline-none focus:border-ps-blue transition-colors w-65 placeholder:text-gray-600"
               />
             </div>
           </div>
@@ -241,8 +241,8 @@ export default function Parent() {
                           {pr.studentIds?.map(s => s.userId?.fullName || 'Học sinh ẩn').join(', ') || 'Chưa liên kết'}
                         </td>
                         <td className="py-4">
-                          <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
-                            pr.userId?.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 'bg-[#c81b3a]/10 text-[#c81b3a]'
+                          <span className={`px-2 py-1 rounded-sm text-xs font-medium ${
+                            pr.userId?.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-red-600/10 text-red-600'
                           }`}>
                             {pr.userId?.status === 'active' ? 'Hoạt động' : 'Đã khóa'}
                           </span>
@@ -267,7 +267,7 @@ export default function Parent() {
       )}
 
       {activeTab === 'create' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-8 max-w-3xl mx-auto">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-8 max-w-3xl mx-auto">
           <div className="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
             <div className="w-10 h-10 rounded-full bg-ps-blue/20 flex items-center justify-center">
               {editingId ? <PencilSimple size={24} weight="fill" className="text-ps-blue" /> : <Plus size={24} weight="bold" className="text-ps-blue" />}
@@ -277,8 +277,8 @@ export default function Parent() {
             </h2>
           </div>
 
-          {error && <div className="mb-6 p-4 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] rounded-[4px] text-sm">{error}</div>}
-          {success && <div className="mb-6 p-4 bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] rounded-[4px] text-sm">{success}</div>}
+          {error && <div className="mb-6 p-4 bg-red-600/10 border border-red-600/20 text-red-600 rounded-sm text-sm">{error}</div>}
+          {success && <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-sm text-sm">{success}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Thông tin tài khoản (User) */}
@@ -291,7 +291,7 @@ export default function Parent() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><IdentificationBadge size={20} /></div>
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required
-                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="VD: Lê Văn C" />
                   </div>
                 </div>
@@ -301,7 +301,7 @@ export default function Parent() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><EnvelopeSimple size={20} /></div>
                     <input type="email" name="email" value={formData.email} onChange={handleChange} required disabled={!!editingId}
-                      className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
                       placeholder="VD: levanc@email.com" />
                   </div>
                 </div>
@@ -313,7 +313,7 @@ export default function Parent() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><Phone size={20} /></div>
                     <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required
-                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="VD: 0912345678" />
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function Parent() {
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><LockKey size={20} /></div>
                       <input type="password" name="password" value={formData.password} onChange={handleChange} required
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                         placeholder="Nhập mật khẩu (từ 6 ký tự)" />
                     </div>
                   </div>
@@ -336,7 +336,7 @@ export default function Parent() {
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><Tag size={20} /></div>
                       <select name="status" value={formData.status} onChange={handleChange}
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
                         <option value="active">Hoạt động (Active)</option>
                         <option value="inactive">Đã khóa (Inactive)</option>
                       </select>
@@ -354,7 +354,7 @@ export default function Parent() {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Mối quan hệ</label>
                   <select name="relationship" value={formData.relationship} onChange={handleChange}
-                    className="w-full h-12 px-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
+                    className="w-full h-12 px-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
                     <option value="father">Bố</option>
                     <option value="mother">Mẹ</option>
                     <option value="guardian">Người giám hộ</option>
@@ -364,7 +364,7 @@ export default function Parent() {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Học sinh liên kết (Chọn nhiều)</label>
                   <select multiple name="studentIds" value={formData.studentIds} onChange={handleChange}
-                    className="w-full h-32 px-4 py-2 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                    className="w-full h-32 px-4 py-2 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                     style={{ colorScheme: 'dark' }}>
                     {allStudents.map(student => (
                       <option key={student._id} value={student._id}>
@@ -379,7 +379,7 @@ export default function Parent() {
 
             <div className="pt-4">
               <button type="submit" disabled={loading}
-                className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center justify-center gap-2">
+                className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors disabled:opacity-70 flex items-center justify-center gap-2">
                 {loading ? 'Đang xử lý...' : (
                   <>
                     {editingId ? <PencilSimple size={20} weight="bold" /> : <Plus size={20} weight="bold" />}

@@ -52,7 +52,7 @@ export default function ChildrenClasses() {
       </div>
 
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
@@ -61,7 +61,7 @@ export default function ChildrenClasses() {
       {loading ? (
         <div className="text-center py-20 text-gray-400">Đang tải dữ liệu lớp học...</div>
       ) : childrenData.length === 0 ? (
-        <div className="bg-[#1a1b1e] rounded-[12px] p-12 text-center border border-gray-800">
+        <div className="bg-surface-dark-card rounded-xl p-12 text-center border border-gray-800">
           <UserCircle size={48} className="text-gray-600 mx-auto mb-4" />
           <h3 className="text-white text-lg font-medium mb-2">Chưa có hồ sơ học sinh</h3>
           <p className="text-gray-400">Tài khoản của bạn chưa được liên kết với học sinh nào. Vui lòng liên hệ trung tâm để được hỗ trợ.</p>
@@ -94,7 +94,7 @@ export default function ChildrenClasses() {
           {/* Classes List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
             {activeChild?.enrollments.length === 0 ? (
-              <div className="col-span-full bg-[#121314] rounded-[8px] border border-gray-800 p-8 text-center text-gray-500">
+              <div className="col-span-full bg-surface-dark-elevated rounded-lg border border-gray-800 p-8 text-center text-gray-500">
                 <Books size={48} className="mx-auto mb-4 text-gray-600" />
                 Bé chưa đăng ký lớp học nào.
               </div>
@@ -105,7 +105,7 @@ export default function ChildrenClasses() {
                 const teacher = classData?.teacherId;
 
                 return (
-                  <div key={enrollment._id} className="bg-[#121314] rounded-[8px] border border-gray-800 p-6 flex flex-col h-full">
+                  <div key={enrollment._id} className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6 flex flex-col h-full">
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-xl text-white font-medium mb-1">
@@ -120,7 +120,7 @@ export default function ChildrenClasses() {
                       </span>
                     </div>
 
-                    <div className="text-gray-400 text-sm mb-6 flex-grow">
+                    <div className="text-gray-400 text-sm mb-6 grow">
                       {course?.description || "Khoá học chất lượng cao tại trung tâm."}
                     </div>
 
@@ -133,7 +133,7 @@ export default function ChildrenClasses() {
                       
                       {teacher?.userId?.phone && (
                         <div className="flex items-center gap-3 text-sm">
-                          <div className="w-[18px]" />
+                          <div className="w-4.5" />
                           <span className="text-gray-400 w-24">SĐT:</span>
                           <span className="text-white font-medium">{teacher.userId.phone}</span>
                         </div>
@@ -141,7 +141,7 @@ export default function ChildrenClasses() {
                       
                       {teacher?.userId?.email && (
                         <div className="flex items-center gap-3 text-sm">
-                          <div className="w-[18px]" />
+                          <div className="w-4.5" />
                           <span className="text-gray-400 w-24">Email:</span>
                           <span className="text-white font-medium">{teacher.userId.email}</span>
                         </div>

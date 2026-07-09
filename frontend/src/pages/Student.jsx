@@ -183,7 +183,7 @@ export default function Student() {
       </div>
 
       {activeTab === 'list' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-6">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6">
             <div className="flex items-center gap-2">
               <UserSquare size={24} className="text-ps-blue" />
@@ -198,7 +198,7 @@ export default function Student() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm theo mã, tên, email..."
-                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-[4px] text-sm focus:outline-none focus:border-ps-blue transition-colors w-[260px] placeholder:text-gray-600"
+                className="h-9 pl-9 pr-3 bg-black border border-gray-800 text-white rounded-sm text-sm focus:outline-none focus:border-ps-blue transition-colors w-65 placeholder:text-gray-600"
               />
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function Student() {
                               {st.enrolledClasses.map((code) => (
                                 <span
                                   key={code}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-xs font-medium bg-ps-blue/10 text-ps-blue border border-ps-blue/20"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-ps-blue/10 text-ps-blue border border-ps-blue/20"
                                 >
                                   <Chalkboard size={12} />
                                   {code}
@@ -251,8 +251,8 @@ export default function Student() {
                           )}
                         </td>
                         <td className="py-4">
-                          <span className={`px-2 py-1 rounded-[4px] text-xs font-medium ${
-                            st.userId?.status === 'active' ? 'bg-[#00a854]/10 text-[#00a854]' : 'bg-[#c81b3a]/10 text-[#c81b3a]'
+                          <span className={`px-2 py-1 rounded-sm text-xs font-medium ${
+                            st.userId?.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-red-600/10 text-red-600'
                           }`}>
                             {st.userId?.status === 'active' ? 'Hoạt động' : 'Đã khóa'}
                           </span>
@@ -277,7 +277,7 @@ export default function Student() {
       )}
 
       {activeTab === 'create' && (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-8 max-w-3xl mx-auto">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-8 max-w-3xl mx-auto">
           <div className="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
             <div className="w-10 h-10 rounded-full bg-ps-blue/20 flex items-center justify-center">
               {editingId ? <PencilSimple size={24} weight="fill" className="text-ps-blue" /> : <Plus size={24} weight="bold" className="text-ps-blue" />}
@@ -287,8 +287,8 @@ export default function Student() {
             </h2>
           </div>
 
-          {error && <div className="mb-6 p-4 bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] rounded-[4px] text-sm">{error}</div>}
-          {success && <div className="mb-6 p-4 bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] rounded-[4px] text-sm">{success}</div>}
+          {error && <div className="mb-6 p-4 bg-red-600/10 border border-red-600/20 text-red-600 rounded-sm text-sm">{error}</div>}
+          {success && <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-sm text-sm">{success}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Thông tin tài khoản (User) */}
@@ -301,7 +301,7 @@ export default function Student() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><IdentificationBadge size={20} /></div>
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required
-                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="VD: Nguyễn Văn A" />
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export default function Student() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><EnvelopeSimple size={20} /></div>
                     <input type="email" name="email" value={formData.email} onChange={handleChange} required disabled={!!editingId}
-                      className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors ${editingId ? 'opacity-50 cursor-not-allowed' : ''}`}
                       placeholder="VD: nguyenvena@email.com" />
                   </div>
                 </div>
@@ -323,7 +323,7 @@ export default function Student() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><Phone size={20} /></div>
                     <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="VD: 0912345678" />
                   </div>
                 </div>
@@ -334,7 +334,7 @@ export default function Student() {
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><LockKey size={20} /></div>
                       <input type="password" name="password" value={formData.password} onChange={handleChange} required
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                         placeholder="Nhập mật khẩu (từ 6 ký tự)" />
                     </div>
                   </div>
@@ -346,7 +346,7 @@ export default function Student() {
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><Tag size={20} /></div>
                       <select name="status" value={formData.status} onChange={handleChange}
-                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
+                        className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
                         <option value="active">Hoạt động (Active)</option>
                         <option value="inactive">Đã khóa (Inactive)</option>
                       </select>
@@ -365,7 +365,7 @@ export default function Student() {
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Mã Học sinh</label>
                     <input type="text" name="studentCode" value={formData.studentCode} onChange={handleChange} required disabled
-                      className="w-full h-12 px-4 bg-gray-900 border border-gray-800 rounded-[4px] text-gray-500 cursor-not-allowed"
+                      className="w-full h-12 px-4 bg-gray-900 border border-gray-800 rounded-sm text-gray-500 cursor-not-allowed"
                       placeholder="VD: HS2024-001" />
                   </div>
                 )}
@@ -374,7 +374,7 @@ export default function Student() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><CalendarBlank size={20} /></div>
                     <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange}
-                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors" style={{ colorScheme: 'dark' }} />
+                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors" style={{ colorScheme: 'dark' }} />
                   </div>
                 </div>
                 <div>
@@ -382,7 +382,7 @@ export default function Student() {
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500"><GenderIntersex size={20} /></div>
                     <select name="gender" value={formData.gender} onChange={handleChange}
-                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
+                      className="w-full h-12 pl-10 pr-4 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors appearance-none">
                       <option value="male">Nam</option>
                       <option value="female">Nữ</option>
                     </select>
@@ -391,22 +391,22 @@ export default function Student() {
               </div>
 
               {/* Thông tin liên hệ khẩn cấp */}
-              <div className="p-4 bg-black border border-gray-800 rounded-[8px]">
+              <div className="p-4 bg-black border border-gray-800 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-300 mb-4 flex items-center gap-2"><Heartbeat size={18} className="text-ps-blue"/> Liên hệ khẩn cấp</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <input type="text" name="emergencyName" value={formData.emergencyName} onChange={handleChange}
-                      className="w-full h-10 px-3 bg-[#121314] border border-gray-800 rounded-[4px] text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-10 px-3 bg-surface-dark-elevated border border-gray-800 rounded-sm text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="Tên người liên hệ..." />
                   </div>
                   <div>
                     <input type="text" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange}
-                      className="w-full h-10 px-3 bg-[#121314] border border-gray-800 rounded-[4px] text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-10 px-3 bg-surface-dark-elevated border border-gray-800 rounded-sm text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="Số điện thoại..." />
                   </div>
                   <div>
                     <input type="text" name="emergencyRelation" value={formData.emergencyRelation} onChange={handleChange}
-                      className="w-full h-10 px-3 bg-[#121314] border border-gray-800 rounded-[4px] text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                      className="w-full h-10 px-3 bg-surface-dark-elevated border border-gray-800 rounded-sm text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                       placeholder="Quan hệ (VD: Bố/Mẹ)..." />
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export default function Student() {
 
             <div className="pt-4">
               <button type="submit" disabled={loading}
-                className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors disabled:opacity-70 flex items-center justify-center gap-2">
+                className="w-full h-12 bg-ps-blue text-white rounded-full font-bold text-[16px] hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors disabled:opacity-70 flex items-center justify-center gap-2">
                 {loading ? 'Đang xử lý...' : (
                   <>
                     {editingId ? <PencilSimple size={20} weight="bold" /> : <Plus size={20} weight="bold" />}

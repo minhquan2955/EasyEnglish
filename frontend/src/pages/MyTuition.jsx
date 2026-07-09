@@ -106,7 +106,7 @@ export default function MyTuition() {
       {loading ? (
         <div className="text-center py-12 text-gray-500">Đang tải...</div>
       ) : tuitionData.length === 0 ? (
-        <div className="bg-[#121314] rounded-[8px] border border-gray-800 p-8 text-center text-gray-500">
+        <div className="bg-surface-dark-elevated rounded-lg border border-gray-800 p-8 text-center text-gray-500">
           <Money size={48} className="mx-auto mb-4 text-gray-600" />
           Chưa có thông tin học phí.
         </div>
@@ -136,7 +136,7 @@ export default function MyTuition() {
                 return (
                   <div
                     key={globalIdx}
-                    className="bg-[#121314] rounded-[8px] border border-gray-800 overflow-hidden"
+                    className="bg-surface-dark-elevated rounded-lg border border-gray-800 overflow-hidden"
                   >
                     {/* Card Header */}
                     <div className="p-5">

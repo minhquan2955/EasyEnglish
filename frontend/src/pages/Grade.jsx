@@ -244,7 +244,7 @@ export default function Grade() {
         {currentLevel === 2 && (
           <button
             onClick={handleCreateExam}
-            className="h-10 px-4 bg-ps-blue text-white rounded-full font-medium text-sm hover:bg-[#0064b7] transition-colors flex items-center gap-2 shadow-lg"
+            className="h-10 px-4 bg-ps-blue text-white rounded-full font-medium text-sm hover:bg-ps-blue-pressed transition-colors flex items-center gap-2 shadow-lg"
           >
             <Plus size={18} weight="bold" />
             Tạo bài kiểm tra
@@ -254,13 +254,13 @@ export default function Grade() {
 
       {/* Messages */}
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
       )}
       {success && (
-        <div className="bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-3 rounded-lg flex items-center gap-2">
           <CheckCircle size={20} />
           <p className="text-sm">{success}</p>
         </div>
@@ -296,7 +296,7 @@ export default function Grade() {
           {currentLevel === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {classes.length === 0 ? (
-                <div className="col-span-full text-center py-20 bg-[#1a1b1e] rounded-[8px] border border-gray-800 text-gray-400">
+                <div className="col-span-full text-center py-20 bg-surface-dark-card rounded-lg border border-gray-800 text-gray-400">
                   Không có lớp học nào đang hoạt động.
                 </div>
               ) : (
@@ -304,7 +304,7 @@ export default function Grade() {
                   <div
                     key={cls._id}
                     onClick={() => handleSelectClass(cls)}
-                    className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-5 cursor-pointer hover:border-ps-blue hover:shadow-[0_0_15px_rgba(0,112,209,0.15)] transition-all group"
+                    className="bg-surface-dark-card border border-gray-800 rounded-lg p-5 cursor-pointer hover:border-ps-blue hover:shadow-[0_0_15px_rgba(0,112,209,0.15)] transition-all group"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
@@ -331,9 +331,9 @@ export default function Grade() {
 
           {/* LEVEL 2: EXAM LIST */}
           {currentLevel === 2 && (
-            <div className="bg-[#1a1b1e] rounded-[8px] border border-gray-800 overflow-hidden">
+            <div className="bg-surface-dark-card rounded-lg border border-gray-800 overflow-hidden">
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#121314] text-gray-400 border-b border-gray-800">
+                <thead className="bg-surface-dark-elevated text-gray-400 border-b border-gray-800">
                   <tr>
                     <th className="px-6 py-4 font-medium">Tên bài kiểm tra</th>
                     <th className="px-6 py-4 font-medium">Loại bài</th>
@@ -362,7 +362,7 @@ export default function Grade() {
                         </td>
                         <td className="px-6 py-4 text-gray-400">Hệ số {exam.maxScore}</td>
                         <td className="px-6 py-4 text-gray-400">
-                          <span className="inline-flex items-center px-2 py-1 bg-[#00a854]/10 text-[#00a854] rounded-md text-xs font-medium">
+                          <span className="inline-flex items-center px-2 py-1 bg-green-500/10 text-green-500 rounded-md text-xs font-medium">
                             {exam.studentCount} bài
                           </span>
                         </td>
@@ -379,7 +379,7 @@ export default function Grade() {
           {currentLevel === 3 && (
             <div className="space-y-6">
               {/* Exam Info Form */}
-              <div className="bg-[#1a1b1e] rounded-[8px] border border-gray-800 p-6">
+              <div className="bg-surface-dark-card rounded-lg border border-gray-800 p-6">
                 <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                   <ClipboardText size={20} className="text-ps-blue" />
                   Thông tin bài kiểm tra
@@ -404,23 +404,23 @@ export default function Grade() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <label className="block text-sm text-gray-400 mb-1">Tên bài kiểm tra <span className="text-[#c81b3a]">*</span></label>
+                      <label className="block text-sm text-gray-400 mb-1">Tên bài kiểm tra <span className="text-red-600">*</span></label>
                       <input
                         type="text"
                         value={examForm.title}
                         onChange={(e) => setExamForm(p => ({ ...p, title: e.target.value }))}
                         disabled={!!selectedExam}
                         placeholder="VD: Midterm Test 1"
-                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
+                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-400 mb-1">Loại bài <span className="text-[#c81b3a]">*</span></label>
+                      <label className="block text-sm text-gray-400 mb-1">Loại bài <span className="text-red-600">*</span></label>
                       <select
                         value={examForm.assessmentType}
                         onChange={(e) => setExamForm(p => ({ ...p, assessmentType: e.target.value }))}
                         disabled={!!selectedExam}
-                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
+                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors disabled:opacity-50"
                       >
                         {assessmentTypes.map(t => (
                           <option key={t.value} value={t.value}>{t.label}</option>
@@ -428,13 +428,13 @@ export default function Grade() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-400 mb-1">Điểm tối đa (Max Score) <span className="text-[#c81b3a]">*</span></label>
+                      <label className="block text-sm text-gray-400 mb-1">Điểm tối đa (Max Score) <span className="text-red-600">*</span></label>
                       <input
                         type="number"
                         min="1"
                         value={examForm.maxScore}
                         onChange={(e) => setExamForm(p => ({ ...p, maxScore: e.target.value }))}
-                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-[4px] text-white focus:outline-none focus:border-ps-blue transition-colors"
+                        className="w-full h-10 px-3 bg-black border border-gray-800 rounded-sm text-white focus:outline-none focus:border-ps-blue transition-colors"
                       />
                     </div>
                   </div>
@@ -442,8 +442,8 @@ export default function Grade() {
               </div>
 
               {/* Grading Table */}
-              <div className="bg-[#1a1b1e] rounded-[8px] border border-gray-800 overflow-hidden">
-                <div className="p-4 bg-[#121314] border-b border-gray-800 flex items-center justify-between">
+              <div className="bg-surface-dark-card rounded-lg border border-gray-800 overflow-hidden">
+                <div className="p-4 bg-surface-dark-elevated border-b border-gray-800 flex items-center justify-between">
                   <h3 className="text-white font-medium flex items-center gap-2">
                     <GraduationCap size={20} className="text-ps-blue" />
                     Bảng nhập điểm ({students.length} học sinh)
@@ -453,7 +453,7 @@ export default function Grade() {
                 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-[#1a1b1e] text-gray-400 border-b border-gray-800">
+                    <thead className="bg-surface-dark-card text-gray-400 border-b border-gray-800">
                       <tr>
                         <th className="px-6 py-3 font-medium w-16">STT</th>
                         <th className="px-6 py-3 font-medium">Học sinh</th>
@@ -487,7 +487,7 @@ export default function Grade() {
                                   step="0.5"
                                   value={gradeData.score}
                                   onChange={(e) => handleGradeChange(sId, 'score', e.target.value)}
-                                  className="w-full h-9 px-3 bg-black border border-gray-700 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
+                                  className="w-full h-9 px-3 bg-black border border-gray-700 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
                                   placeholder="Trống"
                                 />
                               )}
@@ -502,7 +502,7 @@ export default function Grade() {
                                   type="text"
                                   value={gradeData.feedback}
                                   onChange={(e) => handleGradeChange(sId, 'feedback', e.target.value)}
-                                  className="w-full h-9 px-3 bg-black border border-gray-700 rounded-[4px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
+                                  className="w-full h-9 px-3 bg-black border border-gray-700 rounded-sm text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-all"
                                   placeholder="Nhận xét (không bắt buộc)..."
                                 />
                               )}
@@ -520,7 +520,7 @@ export default function Grade() {
                 {!isEditMode ? (
                   <button
                     onClick={() => setIsEditMode(true)}
-                    className="px-8 h-10 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-[#0064b7] active:bg-[#004d8d] transition-colors flex items-center gap-2"
+                    className="px-8 h-10 bg-ps-blue text-white rounded-full font-bold text-sm hover:bg-ps-blue-pressed active:bg-ps-blue-active transition-colors flex items-center gap-2"
                   >
                     Chỉnh sửa / Nhập điểm
                   </button>
@@ -542,7 +542,7 @@ export default function Grade() {
                     <button
                       onClick={handleSaveGrades}
                       disabled={loading}
-                      className="px-8 h-10 bg-[#00a854] text-white rounded-full font-bold text-sm hover:bg-[#008f47] active:bg-[#007339] transition-colors disabled:opacity-70 flex items-center gap-2"
+                      className="px-8 h-10 bg-green-500 text-white rounded-full font-bold text-sm hover:bg-[#008f47] active:bg-[#007339] transition-colors disabled:opacity-70 flex items-center gap-2"
                     >
                       {loading ? 'Đang lưu...' : 'Lưu bảng điểm'}
                     </button>

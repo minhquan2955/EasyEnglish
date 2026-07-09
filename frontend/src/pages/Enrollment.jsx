@@ -180,7 +180,7 @@ export default function Enrollment() {
         {currentLevel === 2 && (
           <button
             onClick={handleOpenModal}
-            className="h-10 px-4 bg-ps-blue text-white rounded-full font-medium text-sm hover:bg-[#0064b7] transition-colors flex items-center gap-2 shadow-lg"
+            className="h-10 px-4 bg-ps-blue text-white rounded-full font-medium text-sm hover:bg-ps-blue-pressed transition-colors flex items-center gap-2 shadow-lg"
           >
             <UserPlus size={18} weight="bold" />
             Thêm học sinh
@@ -190,13 +190,13 @@ export default function Enrollment() {
 
       {/* Messages */}
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
       )}
       {success && (
-        <div className="bg-[#00a854]/10 border border-[#00a854]/20 text-[#00a854] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-3 rounded-lg flex items-center gap-2">
           <CheckCircle size={20} />
           <p className="text-sm">{success}</p>
         </div>
@@ -222,7 +222,7 @@ export default function Enrollment() {
           {currentLevel === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {classes.length === 0 ? (
-                <div className="col-span-full text-center py-20 bg-[#1a1b1e] rounded-[8px] border border-gray-800 text-gray-400">
+                <div className="col-span-full text-center py-20 bg-surface-dark-card rounded-lg border border-gray-800 text-gray-400">
                   Không có lớp học nào đang hoạt động.
                 </div>
               ) : (
@@ -230,7 +230,7 @@ export default function Enrollment() {
                   <div
                     key={cls._id}
                     onClick={() => fetchClassDetails(cls)}
-                    className="bg-[#1a1b1e] border border-gray-800 rounded-[8px] p-5 cursor-pointer hover:border-ps-blue hover:shadow-[0_0_15px_rgba(0,112,209,0.15)] transition-all group"
+                    className="bg-surface-dark-card border border-gray-800 rounded-lg p-5 cursor-pointer hover:border-ps-blue hover:shadow-[0_0_15px_rgba(0,112,209,0.15)] transition-all group"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
@@ -259,19 +259,19 @@ export default function Enrollment() {
 
           {/* LEVEL 2: ENROLLED STUDENTS LIST */}
           {currentLevel === 2 && (
-            <div className="bg-[#1a1b1e] rounded-[8px] border border-gray-800 overflow-hidden">
-              <div className="p-4 bg-[#121314] border-b border-gray-800 flex justify-between items-center">
+            <div className="bg-surface-dark-card rounded-lg border border-gray-800 overflow-hidden">
+              <div className="p-4 bg-surface-dark-elevated border-b border-gray-800 flex justify-between items-center">
                 <h3 className="text-white font-medium">Danh sách học sinh</h3>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   enrolledStudents.length >= selectedClass.maxStudents 
-                    ? 'bg-[#c81b3a]/20 text-[#c81b3a]' 
-                    : 'bg-[#00a854]/20 text-[#00a854]'
+                    ? 'bg-red-600/20 text-red-600' 
+                    : 'bg-green-500/20 text-green-500'
                 }`}>
                   Sĩ số: {enrolledStudents.length} / {selectedClass.maxStudents}
                 </span>
               </div>
               <table className="w-full text-left text-sm">
-                <thead className="bg-[#121314] text-gray-400 border-b border-gray-800">
+                <thead className="bg-surface-dark-elevated text-gray-400 border-b border-gray-800">
                   <tr>
                     <th className="px-6 py-4 font-medium w-16">STT</th>
                     <th className="px-6 py-4 font-medium">Mã HS</th>
@@ -301,7 +301,7 @@ export default function Enrollment() {
                           <td className="px-6 py-4 text-right">
                             <button
                               onClick={() => handleDeleteClick(enrollment._id, student?.userId?.fullName)}
-                              className="p-2 text-gray-400 hover:text-[#c81b3a] hover:bg-[#c81b3a]/10 rounded-md transition-all"
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-600/10 rounded-md transition-all"
                               title="Xóa khỏi lớp"
                             >
                               <Trash size={18} />
@@ -321,25 +321,25 @@ export default function Enrollment() {
       {/* ADD STUDENT MODAL */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setModalOpen(false)}>
-          <div className="bg-[#1a1b1e] rounded-[12px] border border-gray-800 w-full max-w-lg overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-surface-dark-card rounded-xl border border-gray-800 w-full max-w-lg overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-800">
               <h2 className="text-xl text-white font-medium">Thêm học sinh vào lớp {selectedClass?.classCode}</h2>
             </div>
             
             <form onSubmit={handleEnrollStudent} className="p-6 space-y-5">
               {enrolledStudents.length >= selectedClass?.maxStudents && (
-                <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] text-sm">
+                <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg text-sm">
                   Lớp đã đạt sĩ số tối đa ({selectedClass.maxStudents}). Bạn không thể thêm học sinh mới.
                 </div>
               )}
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Chọn học sinh <span className="text-[#c81b3a]">*</span></label>
+                <label className="block text-sm text-gray-400 mb-2">Chọn học sinh <span className="text-red-600">*</span></label>
                 <select
                   value={enrollForm.studentId}
                   onChange={(e) => setEnrollForm(p => ({ ...p, studentId: e.target.value }))}
                   required
-                  className="w-full h-11 px-3 bg-black border border-gray-800 rounded-[6px] text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
+                  className="w-full h-11 px-3 bg-black border border-gray-800 rounded-md text-white focus:outline-none focus:border-ps-blue focus:ring-1 focus:ring-ps-blue transition-colors"
                 >
                   <option value="">-- Chọn học sinh --</option>
                   {availableStudents.map(s => (
@@ -359,7 +359,7 @@ export default function Enrollment() {
                   type="date"
                   value={enrollForm.enrollDate}
                   onChange={(e) => setEnrollForm(p => ({ ...p, enrollDate: e.target.value }))}
-                  className="w-full h-11 px-3 bg-black border border-gray-800 rounded-[6px] text-white focus:outline-none focus:border-ps-blue transition-colors"
+                  className="w-full h-11 px-3 bg-black border border-gray-800 rounded-md text-white focus:outline-none focus:border-ps-blue transition-colors"
                   style={{ colorScheme: 'dark' }}
                 />
               </div>
@@ -370,7 +370,7 @@ export default function Enrollment() {
                   value={enrollForm.notes}
                   onChange={(e) => setEnrollForm(p => ({ ...p, notes: e.target.value }))}
                   rows={3}
-                  className="w-full p-3 bg-black border border-gray-800 rounded-[6px] text-white focus:outline-none focus:border-ps-blue transition-colors resize-none"
+                  className="w-full p-3 bg-black border border-gray-800 rounded-md text-white focus:outline-none focus:border-ps-blue transition-colors resize-none"
                   placeholder="Ghi chú (không bắt buộc)..."
                 />
               </div>
@@ -386,7 +386,7 @@ export default function Enrollment() {
                 <button
                   type="submit"
                   disabled={submitting || enrolledStudents.length >= selectedClass?.maxStudents}
-                  className="px-6 h-10 bg-ps-blue text-white rounded-full font-medium text-sm hover:bg-[#0064b7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 h-10 bg-ps-blue text-white rounded-full font-medium text-sm hover:bg-ps-blue-pressed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Đang lưu...' : 'Thêm vào lớp'}
                 </button>
@@ -399,9 +399,9 @@ export default function Enrollment() {
       {/* DELETE CONFIRMATION MODAL */}
       {deleteModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setDeleteModalOpen(false)}>
-          <div className="bg-[#1a1b1e] rounded-[12px] border border-gray-800 w-full max-w-md overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-surface-dark-card rounded-xl border border-gray-800 w-full max-w-md overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-800 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#c81b3a]/10 text-[#c81b3a] flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-red-600/10 text-red-600 flex items-center justify-center shrink-0">
                 <WarningCircle size={22} weight="bold" />
               </div>
               <h2 className="text-xl text-white font-medium">Xác nhận xóa</h2>
@@ -416,7 +416,7 @@ export default function Enrollment() {
               </p>
             </div>
 
-            <div className="p-6 bg-[#121314] border-t border-gray-800 flex justify-end gap-3">
+            <div className="p-6 bg-surface-dark-elevated border-t border-gray-800 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setDeleteModalOpen(false)}
@@ -427,7 +427,7 @@ export default function Enrollment() {
               <button
                 type="button"
                 onClick={confirmDeleteEnrollment}
-                className="px-6 h-10 bg-[#c81b3a] text-white rounded-full font-medium text-sm hover:bg-[#a6132c] transition-colors"
+                className="px-6 h-10 bg-red-600 text-white rounded-full font-medium text-sm hover:bg-[#a6132c] transition-colors"
               >
                 Xác nhận xóa
               </button>

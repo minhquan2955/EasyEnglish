@@ -211,13 +211,13 @@ export default function Attendance() {
       </div>
 
       {error && (
-        <div className="bg-[#c81b3a]/10 border border-[#c81b3a]/20 text-[#c81b3a] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-red-600/10 border border-red-600/20 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
           <WarningCircle size={20} />
           <p className="text-sm">{error}</p>
         </div>
       )}
       {success && (
-        <div className="bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] px-4 py-3 rounded-[8px] flex items-center gap-2">
+        <div className="bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] px-4 py-3 rounded-lg flex items-center gap-2">
           <CheckCircle size={20} />
           <p className="text-sm">{success}</p>
         </div>
@@ -226,12 +226,12 @@ export default function Attendance() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Column: Class and Schedule Selection */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-[#1a1b1e] rounded-[12px] p-4 border border-gray-800">
+          <div className="bg-surface-dark-card rounded-xl p-4 border border-gray-800">
             <h3 className="text-white font-medium mb-4 flex items-center gap-2">
               <Chalkboard size={20} className="text-ps-blue" />
               1. Chọn Lớp học
             </h3>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-2 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
               {loading && !classes.length && (
                 <p className="text-gray-500 text-sm">Đang tải...</p>
               )}
@@ -239,10 +239,10 @@ export default function Attendance() {
                 <button
                   key={c._id}
                   onClick={() => setSelectedClass(c)}
-                  className={`w-full text-left px-4 py-3 rounded-[8px] transition-colors text-sm ${
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors text-sm ${
                     selectedClass?._id === c._id
                       ? "bg-ps-blue text-white"
-                      : "bg-[#121314] text-gray-400 hover:bg-gray-800 hover:text-gray-200"
+                      : "bg-surface-dark-elevated text-gray-400 hover:bg-gray-800 hover:text-gray-200"
                   }`}
                 >
                   <div className="font-medium">{c.classCode}</div>
@@ -257,13 +257,13 @@ export default function Attendance() {
           </div>
 
           <div
-            className={`bg-[#1a1b1e] rounded-[12px] p-4 border border-gray-800 transition-opacity ${!selectedClass ? "opacity-50 pointer-events-none" : ""}`}
+            className={`bg-surface-dark-card rounded-xl p-4 border border-gray-800 transition-opacity ${!selectedClass ? "opacity-50 pointer-events-none" : ""}`}
           >
             <h3 className="text-white font-medium mb-4 flex items-center gap-2">
               <Calendar size={20} className="text-ps-blue" />
               2. Chọn Buổi học
             </h3>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-2 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
               {!selectedClass ? (
                 <p className="text-gray-500 text-sm italic">
                   Vui lòng chọn lớp học trước
@@ -277,10 +277,10 @@ export default function Attendance() {
                   <button
                     key={s._id}
                     onClick={() => setSelectedSchedule(s)}
-                    className={`w-full text-left px-4 py-3 rounded-[8px] transition-colors text-sm ${
+                    className={`w-full text-left px-4 py-3 rounded-lg transition-colors text-sm ${
                       selectedSchedule?._id === s._id
                         ? "bg-ps-blue text-white"
-                        : "bg-[#121314] text-gray-400 hover:bg-gray-800 hover:text-gray-200"
+                        : "bg-surface-dark-elevated text-gray-400 hover:bg-gray-800 hover:text-gray-200"
                     }`}
                   >
                     <div className="font-medium">Buổi {s.sessionNumber}</div>
@@ -304,10 +304,10 @@ export default function Attendance() {
         {/* Right Column: Attendance Table */}
         <div className="lg:col-span-3">
           <div
-            className={`bg-[#1a1b1e] rounded-[12px] overflow-hidden border border-gray-800 h-full flex flex-col transition-opacity ${!selectedSchedule ? "opacity-50 pointer-events-none" : ""}`}
+            className={`bg-surface-dark-card rounded-xl overflow-hidden border border-gray-800 h-full flex flex-col transition-opacity ${!selectedSchedule ? "opacity-50 pointer-events-none" : ""}`}
           >
             {/* Table Header */}
-            <div className="p-6 bg-[#121314] border-b border-gray-800 flex items-center justify-between">
+            <div className="p-6 bg-surface-dark-elevated border-b border-gray-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-ps-blue/10 flex items-center justify-center text-ps-blue">
                   <Users size={24} weight="fill" />
@@ -341,7 +341,7 @@ export default function Attendance() {
             {/* Table Content */}
             <div className="flex-1 overflow-x-auto">
               {!selectedSchedule ? (
-                <div className="h-full min-h-[400px] flex items-center justify-center text-gray-500 flex-col gap-3">
+                <div className="h-full min-h-100 flex items-center justify-center text-gray-500 flex-col gap-3">
                   <Calendar size={48} className="text-gray-700" />
                   <p>Vui lòng chọn Buổi học để điểm danh</p>
                 </div>
@@ -355,7 +355,7 @@ export default function Attendance() {
                 </div>
               ) : (
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-[#1a1b1e] text-gray-400 border-b border-gray-800">
+                  <thead className="bg-surface-dark-card text-gray-400 border-b border-gray-800">
                     <tr>
                       <th className="px-6 py-4 font-medium">Mã HS</th>
                       <th className="px-6 py-4 font-medium">Họ tên</th>
@@ -393,7 +393,7 @@ export default function Attendance() {
                               const absentCount = absentStats[student._id] || 0;
                               const isHighAbsence = absentCount >= 3;
                               return (
-                                <span className={`inline-flex items-center justify-center min-w-[2rem] h-8 rounded-full px-2 font-medium text-sm ${
+                                <span className={`inline-flex items-center justify-center min-w-8 h-8 rounded-full px-2 font-medium text-sm ${
                                   isHighAbsence ? 'bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20' : 'bg-gray-800 text-gray-300'
                                 }`}>
                                   {absentCount}
@@ -447,7 +447,7 @@ export default function Attendance() {
                                 handleNotesChange(student._id, e.target.value)
                               }
                               placeholder="Có phép / Không phép..."
-                              className="w-full bg-[#121314] text-white border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ps-blue"
+                              className="w-full bg-surface-dark-elevated text-white border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-ps-blue"
                             />
                           </td>
                           <td className="px-6 py-4 text-center">
