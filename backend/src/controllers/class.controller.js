@@ -2,6 +2,7 @@ import Class from "../models/Class.js";
 import Course from "../models/Course.js";
 import Teacher from "../models/Teacher.js";
 import { checkScheduleConflict } from "../utils/scheduleHelper.js";
+import { ensureTeacherOwnsClass } from "../utils/accessControl.js";
 
 // ==================== CREATE ====================
 /**
@@ -181,6 +182,7 @@ export const getClassById = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy lớp học");
     }
+    await ensureTeacherOwnsClass(req, res, classDoc);
     const Enrollment = (await import("../models/Enrollment.js")).default;
     const studentCount = await Enrollment.countDocuments({
       classId: classDoc._id,

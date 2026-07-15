@@ -139,10 +139,24 @@ export const recordPayment = async (req, res, next) => {
       studentId,
       classId,
       status: "active",
+    }).populate({
+      path: "classId",
+      populate: { path: "courseId", select: "tuitionFee" },
     });
     if (!enrollment) {
       res.status(404);
       throw new Error("Không tìm thấy ghi danh hợp lệ cho học sinh này");
+    }
+
+    const previousPayments = await Payment.find({ studentId, classId }).select("amount");
+    const totalPaid = previousPayments.reduce(
+      (sum, paymentItem) => sum + paymentItem.amount,
+      0,
+    );
+    const tuitionFee = enrollment.classId?.courseId?.tuitionFee || 0;
+    if (tuitionFee > 0 && totalPaid + amount > tuitionFee) {
+      res.status(400);
+      throw new Error("So tien thanh toan vuot qua hoc phi con lai");
     }
 
     const payment = await Payment.create({

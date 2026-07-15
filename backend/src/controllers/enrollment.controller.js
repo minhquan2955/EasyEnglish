@@ -2,6 +2,10 @@ import Enrollment from "../models/Enrollment.js";
 import Student from "../models/Student.js";
 import Class from "../models/Class.js";
 import Parent from "../models/Parent.js";
+import {
+  ensureTeacherOwnsClass,
+  getTeacherClassIdsForRequest,
+} from "../utils/accessControl.js";
 // ==================== CREATE ====================
 /**
  * @desc    Admin ghi danh học sinh vào lớp
@@ -106,6 +110,14 @@ export const getEnrollments = async (req, res, next) => {
     if (classId) filter.classId = classId;
     if (studentId) filter.studentId = studentId;
     if (status) filter.status = status;
+    const teacherClassIds = await getTeacherClassIdsForRequest(req, res);
+    if (teacherClassIds) {
+      if (classId) {
+        await ensureTeacherOwnsClass(req, res, classId);
+      } else {
+        filter.classId = { $in: teacherClassIds };
+      }
+    }
     const skip = (page - 1) * limit;
     const [enrollments, total] = await Promise.all([
       Enrollment.find(filter)
@@ -166,6 +178,11 @@ export const getEnrollmentById = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy bản ghi ghi danh");
     }
+    await ensureTeacherOwnsClass(
+      req,
+      res,
+      enrollment.classId._id || enrollment.classId,
+    );
     res.status(200).json({ enrollment });
   } catch (error) {
     next(error);
@@ -259,6 +276,7 @@ export const getStudentsByClass = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy lớp học");
     }
+    await ensureTeacherOwnsClass(req, res, classDoc);
     const enrollments = await Enrollment.find({
       classId,
       status: "active", // Chỉ lấy học sinh đang hoạt động

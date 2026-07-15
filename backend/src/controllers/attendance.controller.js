@@ -5,6 +5,11 @@ import Student from "../models/Student.js";
 import Parent from "../models/Parent.js";
 import { bulkCheckIn } from "../services/attendance.service.js";
 import mongoose from "mongoose";
+import {
+  ensureTeacherOwnsClass,
+  ensureValidObjectId,
+  getTeacherClassIdsForRequest,
+} from "../utils/accessControl.js";
 
 // ==================== BULK CHECK-IN ====================
 /**
@@ -27,6 +32,13 @@ export const bulkCheckInController = async (req, res, next) => {
 
     // req.user.userId được gắn bởi auth.middleware
     const checkedInBy = req.user.userId;
+
+    const schedule = await Schedule.findById(scheduleId).select("classId");
+    if (!schedule) {
+      res.status(404);
+      throw new Error("Khong tim thay buoi hoc");
+    }
+    await ensureTeacherOwnsClass(req, res, schedule.classId);
 
     // Gọi Service để xử lý logic phức tạp
     const result = await bulkCheckIn({ scheduleId, students, checkedInBy });
@@ -62,12 +74,14 @@ export const getAttendanceBySchedule = async (req, res, next) => {
     // Kiểm tra buổi học tồn tại
     const schedule = await Schedule.findById(scheduleId).populate(
       "classId",
-      "classCode",
+      "classCode teacherId",
     );
     if (!schedule) {
       res.status(404);
       throw new Error("Không tìm thấy buổi học");
     }
+
+    await ensureTeacherOwnsClass(req, res, schedule.classId);
 
     const attendances = await Attendance.find({ scheduleId })
       .populate({
@@ -111,6 +125,9 @@ export const getAttendanceBySchedule = async (req, res, next) => {
 export const getClassAttendanceStats = async (req, res, next) => {
   try {
     const { classId } = req.params;
+
+    ensureValidObjectId(classId, "classId", res);
+    await ensureTeacherOwnsClass(req, res, classId);
 
     const stats = await Attendance.aggregate([
       {
@@ -159,6 +176,15 @@ export const getAttendances = async (req, res, next) => {
     if (studentId) filter.studentId = studentId;
     if (scheduleId) filter.scheduleId = scheduleId;
     if (status) filter.status = status;
+
+    const teacherClassIds = await getTeacherClassIdsForRequest(req, res);
+    if (teacherClassIds) {
+      if (classId) {
+        await ensureTeacherOwnsClass(req, res, classId);
+      } else {
+        filter.classId = { $in: teacherClassIds };
+      }
+    }
 
     const skip = (page - 1) * limit;
 
@@ -215,6 +241,12 @@ export const getAttendanceById = async (req, res, next) => {
       throw new Error("Không tìm thấy bản ghi điểm danh");
     }
 
+    await ensureTeacherOwnsClass(
+      req,
+      res,
+      attendance.classId._id || attendance.classId,
+    );
+
     res.status(200).json({ attendance });
   } catch (error) {
     next(error);
@@ -234,6 +266,8 @@ export const updateAttendance = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy bản ghi điểm danh");
     }
+
+    await ensureTeacherOwnsClass(req, res, attendance.classId);
 
     const updatedAttendance = await Attendance.findByIdAndUpdate(
       req.params.id,

@@ -16,7 +16,8 @@ export const validate = (schema) => {
       res.status(400);
 
       //lấy danh sách lỗi
-      const errorMessages = result.error.errors
+      const issues = result.error.issues || result.error.errors || [];
+      const errorMessages = issues
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join(", ");
       return next(new Error(errorMessages));

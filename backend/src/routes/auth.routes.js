@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { protect } from "../middlewares/auth.middleware.js";
-import { register, login, getMe, getMyProfile } from "../controllers/auth.controller.js";
+import { login, getMe, getMyProfile } from "../controllers/auth.controller.js";
 
 const router = Router();
 
 //Public routes
-router.post("/register", register);
 router.post("/login", login);
 
 //Protected routes

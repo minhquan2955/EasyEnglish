@@ -279,7 +279,6 @@ All endpoints are prefixed with `/api`. Authentication is via `Authorization: Be
 
 | Method | Endpoint               | Access   | Description                              |
 | ------ | ---------------------- | -------- | ---------------------------------------- |
-| `POST` | `/api/auth/register`   | Public   | Register a new user account              |
 | `POST` | `/api/auth/login`      | Public   | Authenticate and receive JWT             |
 | `GET`  | `/api/auth/me`         | Any role | Get current user info                    |
 | `GET`  | `/api/auth/me/profile` | Any role | Get full profile with role-specific data |

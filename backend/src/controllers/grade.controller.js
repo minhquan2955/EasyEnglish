@@ -1,10 +1,51 @@
 import Grade from "../models/Grade.js";
 import Class from "../models/Class.js";
 import Student from "../models/Student.js";
-import Teacher from "../models/Teacher.js";
 import Enrollment from "../models/Enrollment.js";
 import Parent from "../models/Parent.js";
 import mongoose from "mongoose";
+import {
+  ensureTeacherOwnsClass,
+  ensureValidObjectId,
+  getTeacherClassIdsForRequest,
+} from "../utils/accessControl.js";
+
+const getGradingTeacherId = async (req, res, classDoc) => {
+  if (req.user.role === "teacher") {
+    const teacher = await ensureTeacherOwnsClass(req, res, classDoc);
+    return teacher._id;
+  }
+
+  if (req.user.role === "admin") {
+    return classDoc.teacherId;
+  }
+
+  res.status(403);
+  throw new Error("Ban khong co quyen cham diem");
+};
+
+const ensureStudentsAreActiveInClass = async (studentIds, classId, res) => {
+  const uniqueStudentIds = [...new Set(studentIds.map((id) => id.toString()))];
+  const enrollments = await Enrollment.find({
+    classId,
+    studentId: { $in: uniqueStudentIds },
+    status: "active",
+  }).select("studentId");
+
+  const activeStudentIds = new Set(
+    enrollments.map((enrollment) => enrollment.studentId.toString()),
+  );
+  const invalidStudentIds = uniqueStudentIds.filter(
+    (studentId) => !activeStudentIds.has(studentId),
+  );
+
+  if (invalidStudentIds.length > 0) {
+    res.status(400);
+    throw new Error(
+      `Co ${invalidStudentIds.length} hoc sinh khong thuoc lop nay hoac da roi lop`,
+    );
+  }
+};
 
 // ==================== CREATE ====================
 /**
@@ -64,13 +105,7 @@ export const createGrade = async (req, res, next) => {
     // --- Tìm Teacher record từ userId đang đăng nhập ---
     // Token chỉ có userId + role, nên cần query DB để lấy teacherId
     // (gradedBy ref đến Teacher, không phải User)
-    const teacher = await Teacher.findOne({ userId: req.user.userId });
-    if (!teacher) {
-      res.status(403);
-      throw new Error(
-        "Tài khoản này không phải giáo viên, không thể chấm điểm",
-      );
-    }
+    const gradedBy = await getGradingTeacherId(req, res, classDoc);
 
     // --- Tạo bản ghi điểm ---
     const grade = await Grade.create({
@@ -80,7 +115,7 @@ export const createGrade = async (req, res, next) => {
       title,
       score,
       maxScore,
-      gradedBy: teacher._id, // Lấy _id của Teacher record từ DB
+      gradedBy,
       feedback,
     });
 
@@ -119,6 +154,15 @@ export const getGrades = async (req, res, next) => {
     if (classId) filter.classId = classId;
     if (studentId) filter.studentId = studentId;
     if (assessmentType) filter.assessmentType = assessmentType;
+
+    const teacherClassIds = await getTeacherClassIdsForRequest(req, res);
+    if (teacherClassIds) {
+      if (classId) {
+        await ensureTeacherOwnsClass(req, res, classId);
+      } else {
+        filter.classId = { $in: teacherClassIds };
+      }
+    }
 
     const skip = (page - 1) * limit;
 
@@ -181,6 +225,8 @@ export const getGradeById = async (req, res, next) => {
       throw new Error("Không tìm thấy bản ghi điểm");
     }
 
+    await ensureTeacherOwnsClass(req, res, grade.classId._id || grade.classId);
+
     res.status(200).json({ grade });
   } catch (error) {
     next(error);
@@ -225,18 +271,19 @@ export const updateGrade = async (req, res, next) => {
       }
     }
 
-    // Tìm Teacher record từ userId (tương tự createGrade)
-    const teacher = await Teacher.findOne({ userId: req.user.userId });
-    if (!teacher) {
-      res.status(403);
-      throw new Error("Tài khoản này không phải giáo viên, không thể sửa điểm");
+    const classDoc = await Class.findById(grade.classId);
+    if (!classDoc) {
+      res.status(404);
+      throw new Error("Khong tim thay lop hoc cua ban ghi diem");
     }
+
+    const gradedBy = await getGradingTeacherId(req, res, classDoc);
 
     const updatedGrade = await Grade.findByIdAndUpdate(
       req.params.id,
       {
         ...req.body,
-        gradedBy: teacher._id, // Ghi lại người sửa
+        gradedBy,
         gradedAt: new Date(), // Ghi lại thời gian sửa
       },
       { new: true, runValidators: true },
@@ -307,6 +354,13 @@ export const getGradesByStudent = async (req, res, next) => {
       throw new Error("Không tìm thấy học sinh");
     }
 
+    const classDoc = await Class.findById(classId);
+    if (!classDoc) {
+      res.status(404);
+      throw new Error("Khong tim thay lop hoc");
+    }
+    await ensureTeacherOwnsClass(req, res, classDoc);
+
     const grades = await Grade.find({ studentId, classId })
       .populate("classId", "classCode")
       .populate({
@@ -363,6 +417,8 @@ export const getGradesByClass = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy lớp học");
     }
+
+    await ensureTeacherOwnsClass(req, res, classDoc);
 
     // Build filter
     const filter = { classId };
@@ -529,6 +585,14 @@ export const getExamsByClass = async (req, res, next) => {
 
     // Phải convert sang ObjectId để aggregate match hoạt động
 
+    ensureValidObjectId(classId, "classId", res);
+    const classDoc = await Class.findById(classId);
+    if (!classDoc) {
+      res.status(404);
+      throw new Error("Khong tim thay lop hoc");
+    }
+    await ensureTeacherOwnsClass(req, res, classDoc);
+
     const classIdObj = new mongoose.Types.ObjectId(classId);
 
     const exams = await Grade.aggregate([
@@ -599,26 +663,11 @@ export const batchGradeExam = async (req, res, next) => {
       throw new Error("Không tìm thấy lớp học");
     }
 
-    // --- Kiểm tra quyền Teacher ---
-    let teacherId = null;
-    if (req.user.role === "teacher") {
-      const teacher = await Teacher.findOne({ userId: req.user.userId });
-      if (!teacher) {
-        res.status(403);
-        throw new Error("Tài khoản này không phải giáo viên");
-      }
-      // Nếu không phải là giáo viên của lớp, chặn
-      if (classDoc.teacherId.toString() !== teacher._id.toString()) {
-        res.status(403);
-        throw new Error(
-          "Bạn không được phép nhập điểm cho lớp của giáo viên khác",
-        );
-      }
-      teacherId = teacher._id;
-    } else if (req.user.role === "admin") {
-      // Nếu admin chấm điểm thay, gán gradedBy bằng giáo viên của lớp đó
-      teacherId = classDoc.teacherId;
-    }
+    const teacherId = await getGradingTeacherId(req, res, classDoc);
+    const scoreStudentIds = scores
+      .filter((s) => s.score !== undefined)
+      .map((s) => s.studentId);
+    await ensureStudentsAreActiveInClass(scoreStudentIds, classId, res);
 
     // --- Prepare BulkWrite Operations ---
     // Update nếu học sinh đã có điểm cho bài này, Insert nếu chưa có

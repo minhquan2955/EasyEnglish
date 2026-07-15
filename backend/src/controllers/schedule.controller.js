@@ -8,6 +8,10 @@ import {
   generateScheduleForClass,
   deleteSchedulesByClass,
 } from "../services/schedule.service.js";
+import {
+  ensureTeacherOwnsClass,
+  getTeacherProfileForRequest,
+} from "../utils/accessControl.js";
 
 // ==================== GENERATE (Tính năng đặc biệt) ====================
 /**
@@ -153,6 +157,18 @@ export const getSchedules = async (req, res, next) => {
     if (teacherId) filter.teacherId = teacherId;
     if (status) filter.status = status;
 
+    if (req.user.role === "teacher") {
+      const teacher = await getTeacherProfileForRequest(req, res);
+      if (teacherId && teacherId !== teacher._id.toString()) {
+        res.status(403);
+        throw new Error("Ban khong duoc phep xem lich cua giao vien khac");
+      }
+      filter.teacherId = teacher._id;
+      if (classId) {
+        await ensureTeacherOwnsClass(req, res, classId);
+      }
+    }
+
     // Date range filter
     if (from || to) {
       filter.date = {};
@@ -229,6 +245,15 @@ export const getScheduleById = async (req, res, next) => {
     if (!schedule) {
       res.status(404);
       throw new Error("Không tìm thấy buổi học");
+    }
+
+    if (req.user.role === "teacher") {
+      const teacher = await getTeacherProfileForRequest(req, res);
+      const scheduleTeacherId = schedule.teacherId?._id || schedule.teacherId;
+      if (scheduleTeacherId.toString() !== teacher._id.toString()) {
+        res.status(403);
+        throw new Error("Ban khong duoc phep xem lich cua giao vien khac");
+      }
     }
 
     res.status(200).json({ schedule });
@@ -372,6 +397,14 @@ export const getSchedulesByTeacher = async (req, res, next) => {
       throw new Error("Không tìm thấy giáo viên");
     }
 
+    if (req.user.role === "teacher") {
+      const currentTeacher = await getTeacherProfileForRequest(req, res);
+      if (teacher._id.toString() !== currentTeacher._id.toString()) {
+        res.status(403);
+        throw new Error("Ban khong duoc phep xem lich cua giao vien khac");
+      }
+    }
+
     const filter = {
       teacherId,
       status: { $in: ["scheduled", "makeup"] },
@@ -424,6 +457,8 @@ export const getSchedulesByClass = async (req, res, next) => {
       res.status(404);
       throw new Error("Không tìm thấy lớp học");
     }
+
+    await ensureTeacherOwnsClass(req, res, classDoc);
 
     const schedules = await Schedule.find({ classId })
       .populate({

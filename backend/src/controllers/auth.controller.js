@@ -6,52 +6,6 @@ import Parent from "../models/Parent.js"
 import Enrollment from "../models/Enrollment.js"
 import { generateToken } from "../utils/jwt.js"
 
-
-/**
- * @description Dang ky nguoi dung moi
- * @route POST /api/auth/register
- * @access Public
- */
-
-export const register = async (req, res, next) => {
-    try {
-        const {email, password, fullName, phone, role} = req.body;
-
-        //kiem tra email
-        const existingUser = await User.findOne({email});
-        if(existingUser){
-            res.status(400);
-            throw new Error("Email đã được sử dụng");
-        }
-
-        //Bam mat khau truoc khi luu DB
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
-
-        //Tao user
-        const user = await User.create({
-            email,
-            passwordHash,
-            fullName,
-            phone,
-            role: role || "student"
-        })
-
-        //Tao JWT token va tra cho client
-        const token = generateToken({userId: user._id, role: user.role});
-        res.status(201).json({
-            _id: user._id,
-            email: user.email,
-            fullName: user.fullName,
-            role: user.role,
-            phone: user.phone,
-            token
-        })
-    } catch (error) {
-        next(error);
-    }
-}
-
 /**
  * @description Dang nhap
  * @route POST /api/auth/login
