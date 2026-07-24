@@ -1,0 +1,56 @@
+services:
+  # 1. Database MongoDB
+  mongodb:
+    image: mongo:6-jammy
+    container_name: easyenglish-mongo
+    restart: always
+    # Không expose port 27017 ra ngoài host trong production
+    # Chỉ bật dòng dưới nếu cần debug trực tiếp DB từ máy local
+    # ports:
+    #   - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-easyenglish}
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # 2. Express Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: easyenglish-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      # Override MONGO_URI để trỏ vào Docker MongoDB container thay vì Atlas
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_INITDB_DATABASE:-easyenglish}?authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # 3. Frontend React App (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: easyenglish-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
+    driver: local
