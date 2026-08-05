@@ -4,6 +4,8 @@
 ![Express](https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-Alpine-009639?logo=nginx&logoColor=white)
 ![License](https://img.shields.io/badge/License-ISC-blue)
 
 A full-stack web application for managing English language centers. It covers the complete operational lifecycle — from public course marketing and parent consultation registration, through internal administration of courses, classes, schedules, enrollments, attendance, grading, and tuition payments.
@@ -17,6 +19,7 @@ A full-stack web application for managing English language centers. It covers th
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
+- [Docker Deployment](#docker-deployment)
 - [Environment Variables](#environment-variables)
 - [API Endpoints](#api-endpoints)
 - [Design Decisions](#design-decisions)
@@ -44,6 +47,8 @@ A full-stack web application for managing English language centers. It covers th
 | **HTTP Client**        | Axios                                    | 1.x                |
 | **Testing**            | Jest + Supertest                         | 30 / 7             |
 | **Linting**            | ESLint                                   | 10.x               |
+| **Containerization**   | Docker + Docker Compose                  | —                  |
+| **Reverse Proxy**      | Nginx (Alpine)                           | —                  |
 | **Package Manager**    | pnpm (workspace)                         | —                  |
 
 ---
@@ -156,6 +161,10 @@ EasyEnglish_project/
 ├── .env                             # Local environment variables (not committed)
 ├── .env.example                     # Sample environment variables template
 │
+├── Docker-compose.yml               # Multi-container orchestration (MongoDB + Backend + Frontend)
+├── Dockerfile.backend               # Backend container image (Node.js 22 Alpine)
+├── .dockerignore                    # Excludes node_modules, .env, frontend, etc. from backend build
+│
 ├── backend/
 │   └── src/
 │       ├── config/
@@ -177,6 +186,9 @@ EasyEnglish_project/
     ├── index.html
     ├── vite.config.js
     ├── package.json
+    ├── Dockerfile                   # Multi-stage build: Vite → Nginx static serve
+    ├── .dockerignore                # Excludes node_modules, dist, .env from frontend build
+    ├── nginx.conf                   # Nginx config: SPA routing + /api reverse proxy to backend
     └── src/
         ├── main.jsx                 # React entry point
         ├── App.jsx                  # Route definitions
@@ -254,18 +266,120 @@ pnpm test
 
 ---
 
+## Docker Deployment
+
+The project ships with a complete Docker Compose setup that runs the entire stack in three containers — no local Node.js or MongoDB installation required.
+
+### Container Architecture
+
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                        Docker Compose Network                             │
+│                                                                           │
+│  ┌───────────────────┐   ┌───────────────────┐   ┌────────────────────┐   │
+│  │   frontend        │   │   backend         │   │   mongodb          │   │
+│  │   (Nginx Alpine)  │   │   (Node.js 22)    │   │   (Mongo 6)        │   │
+│  │                   │   │                   │   │                    │   │
+│  │  Port 80 → Host   │   │  Port 5000 → Host │   │  Internal only     │   │
+│  │                   │   │                   │   │                    │   │
+│  │  Static files     │──▶│  Express REST API │──▶│  Data persistence │   │
+│  │  /api/* proxy     │   │  JWT auth + RBAC  │   │  Volume: mongo-data│   │
+│  └───────────────────┘   └───────────────────┘   └────────────────────┘   │
+└───────────────────────────────────────────────────────────────────────────┘
+```
+
+### Docker Files Overview
+
+| File                 | Location     | Purpose                                                                                             |
+| -------------------- | ------------ | --------------------------------------------------------------------------------------------------- |
+| `Docker-compose.yml` | Project root | Orchestrates all 3 services (MongoDB, Backend, Frontend)                                            |
+| `Dockerfile.backend` | Project root | Single-stage Node.js 22 Alpine image with pnpm production dependencies                              |
+| `.dockerignore`      | Project root | Excludes `node_modules`, `.env`, `frontend/`, etc. from backend build context                       |
+| `Dockerfile`         | `frontend/`  | Multi-stage build: Stage 1 builds React with Vite, Stage 2 serves static files via Nginx            |
+| `.dockerignore`      | `frontend/`  | Excludes `node_modules`, `dist`, `.env` from frontend build context                                 |
+| `nginx.conf`         | `frontend/`  | Nginx configuration with SPA routing, gzip, security headers, and `/api/*` reverse proxy to backend |
+
+### Prerequisites
+
+- **Docker** >= 20.10
+- **Docker Compose** >= 2.x (bundled with Docker Desktop)
+
+### Quick Start
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/minhquan2955/EasyEnglish.git
+cd EasyEnglish_project
+
+# 2. Create the environment file
+cp .env.example .env
+# Edit .env — add Docker-specific variables (see Environment Variables below)
+
+# 3. Build and start all containers
+docker compose up -d --build
+
+# 4. Check status
+docker compose ps
+```
+
+Once running, open [http://localhost](http://localhost) (port 80) in your browser.
+
+### Common Docker Commands
+
+```bash
+# View logs from all services
+docker compose logs -f
+
+# View logs from a specific service
+docker compose logs -f backend
+
+# Stop all containers
+docker compose down
+
+# Stop and remove volumes (deletes database data)
+docker compose down -v
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# Access MongoDB shell
+docker exec -it easyenglish-mongo mongosh -u admin -p
+```
+
+### How It Works
+
+1. **MongoDB** container starts first with a health check (`mongosh ping`). It uses a named volume (`mongo-data`) for data persistence across restarts. Port 27017 is not exposed to the host by default for security.
+2. **Backend** container waits for MongoDB to be healthy (`depends_on: condition: service_healthy`), then starts the Express API on port 5000. The `MONGO_URI` is automatically overridden to point to the Docker MongoDB container instead of Atlas.
+3. **Frontend** container builds the React app with Vite in a multi-stage Dockerfile (~20MB final image), then serves static files via Nginx on port 80. Nginx handles SPA routing (`try_files`) and reverse-proxies `/api/*` requests to the backend container.
+
+---
+
 ## Environment Variables
 
 Create a `.env` file in the project root with the following variables:
+
+### Core Variables (Required)
 
 | Variable     | Description                                | Example                                                     |
 | ------------ | ------------------------------------------ | ----------------------------------------------------------- |
 | `PORT`       | Server port                                | `5000`                                                      |
 | `NODE_ENV`   | Environment mode                           | `development`                                               |
-| `MONGO_URI`  | MongoDB connection string                  | `mongodb+srv://user:pass@cluster.mongodb.net/EasyEnglishDB` |
+| `MONGO_URI`  | MongoDB connection string (local/Atlas)    | `mongodb+srv://user:pass@cluster.mongodb.net/EasyEnglishDB` |
 | `JWT_SECRET` | Secret key for signing JWTs (min 10 chars) | `your-secure-random-string`                                 |
 
 All variables are validated at startup using Zod. The server will refuse to start if any required variable is missing or invalid.
+
+### Docker-specific Variables (Required when using Docker Compose)
+
+When running with `docker compose`, these additional variables configure the MongoDB container. The Docker Compose file automatically builds the correct `MONGO_URI` from these values — you do **not** need to set `MONGO_URI` manually.
+
+| Variable                     | Description                          | Default       |
+| ---------------------------- | ------------------------------------ | ------------- |
+| `MONGO_INITDB_ROOT_USERNAME` | MongoDB root username                | `admin`       |
+| `MONGO_INITDB_ROOT_PASSWORD` | MongoDB root password (**required**) | —             |
+| `MONGO_INITDB_DATABASE`      | Initial database name                | `easyenglish` |
+
+> **Note:** In Docker mode, `MONGO_URI` is overridden by the compose file to: `mongodb://<username>:<password>@mongodb:27017/<database>?authSource=admin`. You only need to set the three variables above.
 
 ---
 
@@ -432,7 +546,17 @@ Instead of exposing MongoDB `_id` values, the system uses a `Counter` model to g
 
 ### Frontend Proxy Architecture
 
-Vite's dev server proxies `/api/*` requests to the Express backend, eliminating CORS issues during development without additional middleware. In production, both services can be served behind a reverse proxy (e.g., Nginx).
+Vite's dev server proxies `/api/*` requests to the Express backend, eliminating CORS issues during development without additional middleware. In production, Nginx serves the static frontend build and reverse-proxies `/api/*` requests to the backend container — achieving the same seamless API routing in both environments.
+
+### Docker Compose Three-Container Architecture
+
+The Docker deployment uses three isolated containers orchestrated via Docker Compose:
+
+- **MongoDB** (`mongo:6-jammy`) — Runs as an internal-only service with a health check. Port 27017 is deliberately not exposed to the host for security; only the backend container communicates with it through the Docker network. A named volume (`mongo-data`) ensures data survives container restarts.
+- **Backend** (`Dockerfile.backend`) — A single-stage Node.js 22 Alpine image that installs only production dependencies via pnpm. It runs as the `node` user (non-root) for security. The container waits for MongoDB's health check before starting (`depends_on: condition: service_healthy`).
+- **Frontend** (`frontend/Dockerfile`) — A multi-stage build: Stage 1 uses Node.js to compile the React app with Vite; Stage 2 copies only the static output into an Nginx Alpine image (~20MB). The Nginx config handles SPA client-side routing, gzip compression, security headers, static asset caching, and reverse-proxying `/api/*` to the backend container.
+
+This architecture keeps each concern isolated, allows independent scaling, and produces minimal production images.
 
 ### Scheduled Background Task
 
