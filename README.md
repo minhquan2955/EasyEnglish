@@ -10,6 +10,8 @@
 
 A full-stack web application for managing English language centers. It covers the complete operational lifecycle — from public course marketing and parent consultation registration, through internal administration of courses, classes, schedules, enrollments, attendance, grading, and tuition payments.
 
+![Web demo](frontend/src/assets/image.png)
+
 ---
 
 ## Table of Contents
@@ -21,7 +23,6 @@ A full-stack web application for managing English language centers. It covers th
 - [Getting Started](#getting-started)
 - [Docker Deployment](#docker-deployment)
 - [Environment Variables](#environment-variables)
-- [API Endpoints](#api-endpoints)
 - [Design Decisions](#design-decisions)
 - [License](#license)
 
@@ -380,141 +381,6 @@ When running with `docker compose`, these additional variables configure the Mon
 | `MONGO_INITDB_DATABASE`      | Initial database name                | `easyenglish` |
 
 > **Note:** In Docker mode, `MONGO_URI` is overridden by the compose file to: `mongodb://<username>:<password>@mongodb:27017/<database>?authSource=admin`. You only need to set the three variables above.
-
----
-
-## API Endpoints
-
-All endpoints are prefixed with `/api`. Authentication is via `Authorization: Bearer <token>` header.
-
-**Role abbreviations:** A = Admin, T = Teacher, S = Student, P = Parent, Public = No auth required.
-
-### Authentication (`/api/auth`)
-
-| Method | Endpoint               | Access   | Description                              |
-| ------ | ---------------------- | -------- | ---------------------------------------- |
-| `POST` | `/api/auth/login`      | Public   | Authenticate and receive JWT             |
-| `GET`  | `/api/auth/me`         | Any role | Get current user info                    |
-| `GET`  | `/api/auth/me/profile` | Any role | Get full profile with role-specific data |
-
-### Registrations (`/api/registrations`)
-
-| Method | Endpoint                 | Access | Description                      |
-| ------ | ------------------------ | ------ | -------------------------------- |
-| `POST` | `/api/registrations`     | Public | Submit consultation registration |
-| `GET`  | `/api/registrations`     | A      | List all registrations           |
-| `PUT`  | `/api/registrations/:id` | A      | Update registration status       |
-
-### Admin (`/api/admin`)
-
-All routes require Admin role.
-
-| Method | Endpoint                              | Access | Description                         |
-| ------ | ------------------------------------- | ------ | ----------------------------------- |
-| `GET`  | `/api/admin/users`                    | A      | List all users                      |
-| `GET`  | `/api/admin/users/:id`                | A      | Get user by ID                      |
-| `PUT`  | `/api/admin/users/:id`                | A      | Update user details                 |
-| `PUT`  | `/api/admin/users/:id/status`         | A      | Activate/deactivate user            |
-| `POST` | `/api/admin/teachers`                 | A      | Create teacher account              |
-| `GET`  | `/api/admin/teachers`                 | A      | List all teachers                   |
-| `PUT`  | `/api/admin/teachers/:id`             | A      | Update teacher profile              |
-| `POST` | `/api/admin/students`                 | A      | Create student account              |
-| `GET`  | `/api/admin/students`                 | A      | List all students                   |
-| `PUT`  | `/api/admin/students/:id`             | A      | Update student profile              |
-| `POST` | `/api/admin/parents`                  | A      | Create parent account               |
-| `GET`  | `/api/admin/parents`                  | A      | List all parents                    |
-| `PUT`  | `/api/admin/parents/:id`              | A      | Update parent profile               |
-| `POST` | `/api/admin/schedules/generate`       | A      | Auto-generate schedules for a class |
-| `GET`  | `/api/admin/schedules`                | A      | List all schedules                  |
-| `GET`  | `/api/admin/schedules/class/:classId` | A      | Get schedules by class              |
-| `PUT`  | `/api/admin/schedules/:id`            | A      | Update a schedule entry             |
-| `GET`  | `/api/admin/dashboard-stats`          | A      | Dashboard statistics                |
-
-### Courses (`/api/courses`)
-
-| Method   | Endpoint           | Access | Description         |
-| -------- | ------------------ | ------ | ------------------- |
-| `GET`    | `/api/courses`     | A, T   | List all courses    |
-| `GET`    | `/api/courses/:id` | A, T   | Get course details  |
-| `POST`   | `/api/courses`     | A      | Create a new course |
-| `PUT`    | `/api/courses/:id` | A      | Update course       |
-| `DELETE` | `/api/courses/:id` | A      | Delete course       |
-
-### Classes (`/api/classes`)
-
-| Method   | Endpoint           | Access | Description        |
-| -------- | ------------------ | ------ | ------------------ |
-| `GET`    | `/api/classes`     | A, T   | List all classes   |
-| `GET`    | `/api/classes/:id` | A, T   | Get class details  |
-| `POST`   | `/api/classes`     | A      | Create a new class |
-| `PUT`    | `/api/classes/:id` | A      | Update class       |
-| `DELETE` | `/api/classes/:id` | A      | Delete class       |
-
-### Enrollments (`/api/enrollments`)
-
-| Method   | Endpoint                                   | Access | Description                |
-| -------- | ------------------------------------------ | ------ | -------------------------- |
-| `GET`    | `/api/enrollments`                         | A, T   | List all enrollments       |
-| `GET`    | `/api/enrollments/my-children`             | P      | Get children's enrollments |
-| `GET`    | `/api/enrollments/:id`                     | A, T   | Get enrollment by ID       |
-| `GET`    | `/api/enrollments/class/:classId/students` | A, T   | List students in a class   |
-| `POST`   | `/api/enrollments`                         | A      | Enroll student into class  |
-| `PUT`    | `/api/enrollments/:id`                     | A      | Update enrollment          |
-| `DELETE` | `/api/enrollments/:id`                     | A      | Remove enrollment          |
-
-### Schedules (`/api/schedules`)
-
-| Method   | Endpoint                            | Access | Description                     |
-| -------- | ----------------------------------- | ------ | ------------------------------- |
-| `POST`   | `/api/schedules/generate`           | A      | Auto-generate class schedules   |
-| `GET`    | `/api/schedules/my-schedule`        | S      | Student's own schedule          |
-| `GET`    | `/api/schedules/my-children`        | P      | Children's schedules            |
-| `GET`    | `/api/schedules/teacher/:teacherId` | A, T   | Schedules by teacher            |
-| `GET`    | `/api/schedules/class/:classId`     | A, T   | Schedules by class              |
-| `DELETE` | `/api/schedules/class/:classId`     | A      | Delete all schedules of a class |
-| `GET`    | `/api/schedules`                    | A, T   | List all schedules              |
-| `GET`    | `/api/schedules/:id`                | A, T   | Get schedule by ID              |
-| `POST`   | `/api/schedules`                    | A      | Create single schedule entry    |
-| `PUT`    | `/api/schedules/:id`                | A      | Update schedule                 |
-| `DELETE` | `/api/schedules/:id`                | A      | Delete schedule                 |
-
-### Attendance (`/api/attendances`)
-
-| Method | Endpoint                                | Access | Description                 |
-| ------ | --------------------------------------- | ------ | --------------------------- |
-| `GET`  | `/api/attendances/my-attendance`        | S      | Student's own attendance    |
-| `GET`  | `/api/attendances/my-children`          | P      | Children's attendance       |
-| `POST` | `/api/attendances/bulk`                 | A, T   | Bulk check-in for a session |
-| `GET`  | `/api/attendances/schedule/:scheduleId` | A, T   | Attendance by session       |
-| `GET`  | `/api/attendances/class/:classId/stats` | A, T   | Class attendance statistics |
-| `GET`  | `/api/attendances`                      | A, T   | List all attendance records |
-| `GET`  | `/api/attendances/:id`                  | A, T   | Get attendance by ID        |
-| `PUT`  | `/api/attendances/:id`                  | A, T   | Update attendance record    |
-
-### Grades (`/api/grades`)
-
-| Method   | Endpoint                                        | Access | Description                 |
-| -------- | ----------------------------------------------- | ------ | --------------------------- |
-| `GET`    | `/api/grades/my-grades`                         | S      | Student's own grades        |
-| `GET`    | `/api/grades/my-children`                       | P      | Children's grades           |
-| `GET`    | `/api/grades/student/:studentId/class/:classId` | A, T   | Grades by student per class |
-| `GET`    | `/api/grades/class/:classId`                    | A, T   | Full gradebook for a class  |
-| `GET`    | `/api/grades/class/:classId/exams`              | A, T   | List exams for a class      |
-| `POST`   | `/api/grades/class/:classId/exam`               | A, T   | Batch score an exam         |
-| `GET`    | `/api/grades`                                   | A, T   | List all grade records      |
-| `GET`    | `/api/grades/:id`                               | A, T   | Get grade by ID             |
-| `POST`   | `/api/grades`                                   | A, T   | Create grade entry          |
-| `PUT`    | `/api/grades/:id`                               | A, T   | Update grade                |
-| `DELETE` | `/api/grades/:id`                               | A      | Delete grade                |
-
-### Tuition (`/api/tuition`)
-
-| Method | Endpoint                                         | Access | Description                         |
-| ------ | ------------------------------------------------ | ------ | ----------------------------------- |
-| `GET`  | `/api/tuition/admin`                             | A      | List tuition status of all students |
-| `POST` | `/api/tuition/admin/pay`                         | A      | Record a payment                    |
-| `GET`  | `/api/tuition/admin/history/:studentId/:classId` | A      | Payment history for a student       |
-| `GET`  | `/api/tuition/my-payments`                       | S, P   | View own/children's payment history |
 
 ---
 
